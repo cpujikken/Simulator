@@ -2,19 +2,33 @@
 #include <stdlib.h>
 #include "assoc.h"
 
+//連想配列を2分木で実装
+
 struct assoc *create_assoc() {
   return NULL;
-  /*
-  struct assoc *a = malloc(sizeof(struct assoc));
-  char dummy[2] = "0";
-  a->key = dummy;
-  a->val = 0;
-  a->next = NULL;
-  return a;
-  */
 }
 
 struct assoc *insert_assoc(char *s, int v,struct assoc *a) {
+  if(a == NULL) {
+    struct assoc *b = malloc(sizeof(struct assoc));
+    char *k = malloc(32);
+    strcpy(k,s);
+    b->key = k;
+    b->val = v;
+    b->lchild = NULL;
+    b->rchild = NULL;
+    return b;
+  }
+  if(strcmp(s,a->key) < 0) {
+    a->lchild = insert_assoc(s,v,a->lchild);
+  } else if (strcmp(s,a->key) > 0) {
+    a->rchild = insert_assoc(s,v,a->rchild);
+  } else {
+    a->val = v;
+  }
+  return a;
+}
+  /*
   struct assoc *b = malloc(sizeof(struct assoc));
   char *k = malloc(32);
   strcpy(k,s);
@@ -22,27 +36,23 @@ struct assoc *insert_assoc(char *s, int v,struct assoc *a) {
   b->val = v;
   b->next = a;
   return b;
-  /*
-  struct assoc *b = malloc(sizeof(struct assoc));
-  char k[32];
-  strcpy(k,s);
-  b->key = k;
-  b->val = v;
-  b->next = NULL;
-  struct assoc *c = a;
-  while(c->next != NULL) {
-    c = c->next;
-  }
-  c->next = b;
-  return a;
-  */
 }
+  */
+
 
 int find_assoc(char *s,struct assoc *a) {
   if(a==NULL) {
     return -1;
   }
-  
+  if(strcmp(s,a->key) < 0) {
+    return find_assoc(s,a->lchild);
+  } else if (strcmp(s,a->key) > 0) {
+    return find_assoc(s,a->rchild);
+  } else {
+    return a->val;
+  }
+}
+  /*  
   struct assoc *b = a;
   while(b->next != NULL) {
     if(strcmp(s,b->key) == 0) {
@@ -57,3 +67,4 @@ int find_assoc(char *s,struct assoc *a) {
   
   return -1;
 }
+  */
