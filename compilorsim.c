@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "assoc.h"
 
+//ロードストアに使う共用体 byte単位読み込みとかで必要
 typedef union {
   int i;
   float f;
@@ -26,8 +27,8 @@ const int UNDEFINED = 3;
 
 //for debug
 int print_debug = 1;//各命令の実行結果を一々表示したくないときはここを0にする
-int step = 0;//step実行したいときはここを1にする
-int stop = 0;
+//int step = 0;//step実行したいときはここを1にする(未実装)
+int stop = 0;//コードの実行を中止/完了する
 
 const int INVALID_REGISTER = 17;
 const int SYNTAX_ERROR = -1;
@@ -37,17 +38,6 @@ const int HALF = 16;
 const int WORD = 32;
 const int WORDL = 15;
 const int WORDR = 17;
-//エラー処理
-void pcause(int status, int line) {
-  printf("error at line:%d",line);
-  if(status == INVALID_REGISTER) {
-    printf("invalid register");
-  }
-  else if(status == SYNTAX_ERROR) {
-    printf("syntax error\n");
-  }
-  return;
-}
 
 //"2" "r10" "fr5"などの文字列からレジスタ番号を読みとる
 int read_reg(char *s) {
@@ -100,7 +90,7 @@ int branch(char *s) {
       printf("find label error : %s\n",s);
       stop = 1;
     }
-    //アセンブラのことを考えるとi-pcを求めてからpc+=(i-pc)とすべき？
+    //番地を代入してるが、本来はi-pcを求めてからpc+=(i-pc)とすべき？
     if(stop == 0) pc = i;
   }
   return 0;
@@ -123,7 +113,7 @@ int jump(char *s) {
   return 0;
 }
 
-//ロードストア
+//ロードストア 
 int load(int rnum,char *s,int size) {
   int m = read_base_rel(s);
   Mydata md;
@@ -181,12 +171,14 @@ int store(int rnum,char *s,int size) {
   return 0;
 }
 
+//コード一行を実行
 int execute(char *s) {
   int status;
   char opc[32] = "";
   char opr1[32] = "";
   char opr2[32] = "";
   char opr3[32] = "";
+  //コードをオペコード、オペランド１、オペランド２、オペランド３に分解
   sscanf(s,"%s %[^, \t\n] , %[^, \t\n] , %[^, \t\n] ",opc,opr1,opr2,opr3);
 
   int ra = read_reg(opr1);
@@ -196,6 +188,8 @@ int execute(char *s) {
   int nojump = 1;
   
   //printf("->OPECODE:%s OPERAND1:%s OPERAND2:%s OPERAND3:%s\n",opc,opr1,opr2,opr3);
+  
+  //オペコードによる場合分け
   if(opc[0] == '\0' || opc[0] == '\n' || strcmp(opc,"NOP") == 0) {
   }
   else if(strcmp(opc,"add") * strcmp(opc,"ADD") == 0) {
@@ -328,7 +322,8 @@ int execute(char *s) {
     printf(" => finish\n");
     stop = 1;
   }
-  else {//ラベルへの対応
+  //ラベルへの対応
+  else {
     char c = '\0';
     char label[32] = "";
     sscanf(opc,"%[^:]%s",label,&c);
@@ -417,15 +412,13 @@ int main(int argc,char *argv[])
   }
   fclose(fp);
   
-  //execute
+  //1行ずつ実行
   while(stop == 0 && pc <= line) {
     printf("%d : %s",pc,code[pc]);
     status = execute(code[pc]);
-    if(status != 0) {
-      pcause(status,line);
-      return -1;
-    }
   }
+
+  //最後にレジスタ等を表示
   print_reg();
   print_freg();
   print_pc();
