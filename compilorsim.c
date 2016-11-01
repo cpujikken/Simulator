@@ -39,9 +39,9 @@ const int WORD = 32;
 const int WORDL = 15;
 const int WORDR = 17;
 
-//"2" "r10" "fr5"などの文字列からレジスタ番号を読みとる
+//"2" "%r10" "%fr5"などの文字列からレジスタ番号を読みとる
 int read_reg(char *s) {
-  while(s[0] == 'r' || s[0] == 'R' || s[0] == 'f' || s[0] == 'F') {
+  while(s[0] == '%' || s[0] == 'r' || s[0] == 'R' || s[0] == 'f' || s[0] == 'F') {
     s++;
   }
   int i = atoi(s);
@@ -199,7 +199,7 @@ int execute(char *s) {
   }
   else if(strcmp(opc,"addi") * strcmp(opc,"ADDI") == 0) {
     //ADDI Rd,Rs,imm : Rd=Rs+imm
-    reg[ra] = reg[rb] + atoi(opr3);
+    reg[ra] = reg[rb] + atoi(opr3+1);//即値は"$523"の形
     setflag(ra);
   }
   else if(strcmp(opc,"shiftl") * strcmp(opc,"SHIFTL") == 0) {
