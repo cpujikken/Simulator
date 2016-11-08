@@ -11,11 +11,21 @@ typedef struct {
   unsigned int opr1;
   unsigned int opr2;
   unsigned int opr3;
-  short int const16; //off16も同じ
+  short const16; //off16も同じ
   unsigned int bits5;
   unsigned int off_addr26;//+-はどうやって...？
   int off21; //SIGNED!!!
 } Operation;
+
+typedef struct {
+  unsigned int rd;
+  short off16;
+  unsigned int rs;
+  unsigned int ro;
+  unsigned int size4;
+  unsigned int rs_dynamic;
+  unsigned int addr21;
+} Ldst;
 
 //ロードストアに使う共用体 byte単位読み込みとかで必要
 typedef union {
@@ -30,6 +40,7 @@ int reg[32];
 float freg[32];
 const int REG_LR = 31;//link register
 const int REG_SP = 30;//stack pointer
+const int REG_CL = 28;//register for closure
 unsigned char memory[MEM_SIZE];
 int init_pc = 0;
 int pc = 0;
@@ -49,9 +60,8 @@ int mode_step = 0;
 int print_debug = 1;//各命令の実行結果を一々表示したくないときはここを0にする
 //int step = 0;//step実行したいときはここを1にする(未実装)
 int stop = 0;//コードの実行を中止/完了する
-
-
   
+
 //読み込んだ命令(32bit)を16進数表示 リトルエンディアン用
 void print_hex(unsigned int op) {
   Mydata myd;
@@ -66,6 +76,17 @@ void print_mem_hex(int addr) {
   return;
 }
 
+//デバッグ情報表示モードのときのみ
+void dprintr(unsigned int rnum) {
+  if(print_debug)
+    printf(" => r%d = %d\n",rnum,reg[rnum]);
+  return;
+}
+void dprintfr(unsigned int rnum){
+  if(print_debug)
+    printf(" => fr%d = %f\n",rnum,freg[rnum]);
+  return;
+}
 //メモリから32bitをunsigned int型で読み込む
 //学科pcはリトルエンディアンなので、後ろから読み込む必要があります
 unsigned int read_mem32(int mem_addr) {
@@ -82,9 +103,9 @@ Operation parse(unsigned int op) {
   Operation o;
   //オペコード=上位6bit register:5bit for each
   o.opc = op >> 26;
-  o.opr1 = (op >> 21) & 0b1111;
-  o.opr2 = (op >> 16) & 0b1111;
-  o.opr3 = (op >> 11) & 0b1111;
+  o.opr1 = (op >> 21) & 0b11111;
+  o.opr2 = (op >> 16) & 0b11111;
+  o.opr3 = (op >> 11) & 0b11111;
   o.const16 = (short)((op >> 2) & 0b1111111111111111);//?
   o.bits5 = (op >> 13) & 0b11111;
   o.off_addr26 = op & 0x3ffffff;//lower 26bit
@@ -95,6 +116,18 @@ Operation parse(unsigned int op) {
     o.off21 = (hojo - 0x100000) * -1;
   }
   return o;
+}
+
+Ldst parse_ldst(unsigned int op) {
+  Ldst l;
+  l.rd = (op >> 21) & 0b11111;
+  l.off16 = (op >> 5) & 0xffff;
+  l.rs = op & 0b11111;
+  l.ro = (op >> 16) & 0b11111;
+  l.size4 = (op >> 11) & 0b1111;
+  l.rs_dynamic = (op >> 7) & 0b11111;
+  l.addr21 = op & 0x1fffff;
+  return l;
 }
 
 int setflag(int rnum) {
@@ -121,8 +154,7 @@ int pfloat(int rnum) {
  * メモリにはビッグエンディアンで書かれてるが、レジスタに載せる際は
  * リトルエンディアンにしないと、シミュレータ的にはすごく不便
  */
-int load(unsigned int rnum,unsigned int rs,int offset) {
-  int addr =  reg[rs] + offset;//番地
+int load(unsigned int rnum,unsigned int addr) {
   Mydata md;
   unsigned int i;
   md.i = 0;
@@ -134,9 +166,7 @@ int load(unsigned int rnum,unsigned int rs,int offset) {
     printf(" => LOADED %d FROM MEMORY[%d]\n",reg[rnum],addr);
   return 0;
 }
-
-int fload(unsigned int rnum,unsigned int rs,int offset) {
-  int addr =  reg[rs] + offset;
+int fload(unsigned int rnum,int addr) {
   Mydata md;
   int i;
   md.f = 0;
@@ -150,8 +180,7 @@ int fload(unsigned int rnum,unsigned int rs,int offset) {
 }
 
 //ストア
-int store(unsigned int rnum,unsigned int rs,int offset) {
-  int addr = reg[rs] + offset;
+int store(unsigned int rnum,int addr) {
   Mydata md;
   int i;
   
@@ -164,8 +193,7 @@ int store(unsigned int rnum,unsigned int rs,int offset) {
   return 0;
 }
 
-int fstore(unsigned int rnum,unsigned int rs,int offset) {
-  int addr = reg[rs] + offset;
+int fstore(unsigned int rnum,unsigned int addr) {
   Mydata md;
   int i;
   
@@ -178,6 +206,7 @@ int fstore(unsigned int rnum,unsigned int rs,int offset) {
   return 0;
 }
 
+/*
 //push: store reg[x] in memory[previous SP] and SP-=4
 void push(unsigned int rnum) {
   store(rnum,REG_SP,0);
@@ -195,6 +224,13 @@ void pop(unsigned int rnum) {
     printf(" => SP += 4\n");
   return;
 }
+*/
+void switch_num(int *x,int *y) {
+  int z = *x;
+  *x = *y;
+  *y = z;
+  return;
+}
 
 //コード一行を実行
 int execute(unsigned int op) {
@@ -203,6 +239,7 @@ int execute(unsigned int op) {
   unsigned int ra = o.opr1;
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
+  Ldst l = parse_ldst(op);
   //命令名を表示する？
   //printf("operation code:%d\n",o.opc);
   //オペコードによる場合分け
@@ -211,15 +248,15 @@ int execute(unsigned int op) {
     break;
   case OP_ADD:
     reg[ra] = reg[rb] + reg[rc];
-    setflag(ra);
+    //setflag(ra);
     break;
   case OP_SUB:
     reg[ra] = reg[rb] - reg[rc];
-    setflag(ra);
+    //setflag(ra);
     break;
   case OP_ADDI:
     reg[ra] = reg[rb] + o.const16;
-    setflag(ra);
+    //setflag(ra);
     break;
     /*
   case OP_SHIFTL:
@@ -256,11 +293,13 @@ int execute(unsigned int op) {
     */
   case OP_HALF:
     reg[ra] = reg[rb] >> 1;
-    setflag(ra);
+    dprintr(ra);
+    //setflag(ra);
     break;
   case OP_FOUR:
     reg[ra] = reg[rb] << 2;
-    setflag(ra);
+    dprintr(ra);
+    //setflag(ra);
     break;
   case OP_J:
     pc = o.off_addr26;
@@ -336,17 +375,110 @@ int execute(unsigned int op) {
   case OP_LINK:
     pc = reg[REG_LR];
     break;
+    /*
   case OP_PUSH:
     push(ra);
     break;
   case OP_POP:
     pop(ra);
     break;
+    */
   case OP_OUT:
     printf(" => OUT\n");
     stop = 1;
     break;
-  case OP_LDATA:
+  case OP_JC:
+    pc = reg[REG_CL];
+    break;
+  case OP_JLINKC:
+    //jump and link to reg_clってこういうことだよね？
+    switch_num(&pc,&reg[REG_LR]);
+    break;
+  case OP_MV:
+    reg[ra]=reg[rb];
+    dprintr(ra);
+    break;
+  case OP_NEG1:
+    reg[ra] = -1 * reg[ra];
+    dprintr(ra);
+    break;
+  case OP_FNEG1:
+    freg[ra] = -1 * freg[ra];
+    dprintfr(ra);
+    break;
+  case OP_NEG2:
+    reg[ra] = -1 * reg[rb];
+    dprintr(ra);
+    break;
+  case OP_FNEG2:
+    freg[ra] = -1 * freg[rb];
+    dprintfr(ra);
+    break;
+  case OP_INC:
+    reg[ra] = reg[ra] + 1;
+    dprintr(ra);
+    break;
+  case OP_DEC:
+    reg[ra] = reg[ra] - 1;
+    break;
+  case OP_INC1:
+    reg[ra] = reg[rb] + 1;
+    dprintr(ra);
+    break;
+  case OP_DEC1:
+    reg[ra] = reg[rb] - 1;
+    dprintr(ra);
+    break;
+  case OP_MVI:
+    reg[ra] = o.off21;
+    dprintr(ra);
+    break;
+  case OP_LDR:
+    load(l.rd,reg[l.rs]+l.off16);
+    break;
+  case OP_LDD:
+    load(l.rd,reg[l.rs] + l.ro * l.size4);
+    break;
+  case OP_LDA:
+    load(l.rd,l.addr21);
+    break;
+  case OP_SDR:
+    store(l.rd,reg[l.rs]+l.off16);
+    break;
+  case OP_SDD:
+    store(l.rd,reg[l.rs] + l.ro * l.size4);
+    break;
+  case OP_SDA:
+    store(l.rd,l.addr21);
+    break;
+  case OP_FLDR:
+    fload(l.rd,reg[l.rs]+l.off16);
+    break;
+  case OP_FLDD:
+    fload(l.rd,reg[l.rs] + l.ro * l.size4);
+    break;
+  case OP_FLDA:
+    fload(l.rd,l.addr21);
+    break;
+  case OP_FSDR:
+    fstore(l.rd,reg[l.rs]+l.off16);
+    break;
+  case OP_FSDD:
+    fstore(l.rd,reg[l.rs] + l.ro * l.size4);
+    break;
+  case OP_FSDA:
+    fstore(l.rd,l.addr21);
+    break;
+  case OP_XOR:
+    reg[ra] = (reg[rb] ^ reg[rc]);
+    setflag(ra);
+    if(print_debug)
+      printf(" => r%d = %d\n",ra,reg[ra]);
+    break;
+  case OP_FMV:
+    freg[ra] = freg[rb];
+    if(print_debug)
+      printf(" => fr%d = %f\n",ra,freg[ra]);
     /*
   case OP_FLW:
     fload(ra,rb,o.const16);
@@ -444,7 +576,7 @@ int main(int argc,char *argv[])
   while(stop == 0) {
     op = read_mem32(pc);
     if(print_debug)
-      printf("IP = %d | ",pc);
+      printf("IP = %d | operation = ",pc);
       print_mem_hex(pc);
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
