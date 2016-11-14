@@ -1,0 +1,108 @@
+#ifndef _BASE_H_
+#define _BASE_H_
+
+#include <stdio.h>
+
+#define MEM_SIZE 67108864
+#define INIT_SP 67108860
+#define NUM_OF_OP 52
+#define REG_LR 31
+#define REG_SP 30
+#define REG_CL 28 //register for closure
+#define ZF 6 //zero flag
+#define FEQ 0 //eq flag
+#define FGT 1
+#define FLT 2
+#define UNDEFINED 3
+extern int reg[];
+extern float freg[];
+extern char memory[];
+extern int pc;
+extern int init_pc;
+extern int lr;
+extern int link;
+extern int flag[];
+extern int float_flag[];
+extern char default_file[];
+extern char *filename;
+extern FILE *fp;
+extern FILE *fp_out;
+extern unsigned int op;
+
+//デバッグ、統計情報用
+extern int mode_step;
+extern int print_debug;
+extern int stop;
+extern int used[];//各命令が使われた回数
+extern int branch;//条件分岐で分岐したか
+extern int nbranch;//否か
+
+//byte単位読み込みとかで使う共用体
+typedef union {
+  unsigned int i;
+  unsigned short sh[2];
+  unsigned char c[4];
+  int si;
+  float f;
+} Mydata;
+
+
+//オペコード
+#define OP_NOP		0
+#define OP_ADD		1
+#define OP_SUB		2
+#define OP_ADDI		3
+#define OP_HALF		4
+#define OP_FOUR		5
+#define OP_J		6
+#define OP_JZ		7
+#define OP_FJLT		8
+#define OP_FADD		9
+#define OP_FSUB		10
+#define OP_FMUL		11
+#define OP_FDIV		12
+#define OP_FCMP		13
+#define OP_FJEQ		14
+#define OP_CMP		15
+#define OP_JLINK	16
+#define OP_LINK		17
+#define OP_OUT		18
+#define OP_JC		19
+#define OP_JLINKC	20
+#define OP_MV		21
+#define OP_NEG1		22
+#define OP_FNEG1	23
+#define OP_NEG2		24
+#define OP_FNEG2	25
+#define OP_INC		26
+#define OP_DEC		27
+#define OP_INC1		28
+#define OP_DEC1		29
+#define OP_MVI		30
+#define OP_LDR		31
+#define OP_LDD		32
+#define OP_LDA		33
+#define OP_SDR		34
+#define OP_SDD		35
+#define OP_SDA		36
+#define OP_FLDR		37
+#define OP_FLDD		38
+#define OP_FLDA		39
+#define OP_FSDR		40
+#define OP_FSDD		41
+#define OP_FSDA		42
+#define OP_XOR		43
+#define OP_FMV		44
+#define OP_SL		45
+#define OP_SR		46
+#define OP_RF		47
+#define OP_RI		48
+#define OP_PRINT       	49
+#define OP_FABS		50
+#define OP_MUL		51
+#define OP_DIV		52
+
+
+
+#endif
+

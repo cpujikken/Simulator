@@ -1,6 +1,9 @@
-bsim: assoc.h assoc.c opcode.h binarysim.c
-	gcc -o bsim assoc.c binarysim.c
-sim: assoc.h assoc.c compilorsim.c
-	gcc -o sim assoc.c compilorsim.c
+TARGET= bsim
+CC = gcc
+SOURCES = base.c print.c execute.c main.c
+
+$(TARGET): $(SOURCES)
+	$(CC) -o $@ $^
+
 clean:
-	rm sim bsim
+	rm $(TARGET)
