@@ -63,6 +63,8 @@ void print_pc() {
   return;
 }
 
+void print_link_stack();
+
 //統計情報をプリントアウト
 void print_statistics() {
   int i;
@@ -75,7 +77,12 @@ void print_statistics() {
   }
 
   //条件分岐回数をプリント
-  printf("\nbranched:%d times, not branched:%d times\n",branch,nbranch);
+  for(i=0;i<NUM_OF_OP;i++) {
+    if(branch[i] > 0 || nbranch[i] > 0) {
+      print_opc(i);
+      printf(" -> branched:%d times, not branched:%d times\n",branch[i],nbranch[i]);
+    }
+  }
 }
 
 void print_opc(unsigned int opcode) {

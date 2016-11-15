@@ -1,8 +1,6 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-#include <stdio.h>
-
 #define MEM_SIZE 67108864
 #define INIT_SP 67108860
 #define NUM_OF_OP 52
@@ -28,14 +26,16 @@ extern char *filename;
 extern FILE *fp;
 extern FILE *fp_out;
 extern unsigned int op;
+extern unsigned int link_stack[];
+extern unsigned int link_sp;
 
 //デバッグ、統計情報用
 extern int mode_step;
 extern int print_debug;
 extern int stop;
 extern int used[];//各命令が使われた回数
-extern int branch;//条件分岐で分岐したか
-extern int nbranch;//否か
+extern int branch[];//条件分岐で分岐したか
+extern int nbranch[];//否か
 
 //byte単位読み込みとかで使う共用体
 typedef union {

@@ -81,7 +81,6 @@ int setflag(int rnum) {
   return 0;
 }
 
-
 /*
  * ロード
  * メモリにはビッグエンディアンで書かれてるが、レジスタに載せる際は
@@ -139,30 +138,20 @@ int fstore(unsigned int rnum,unsigned int addr) {
   return 0;
 }
 
-/*
-//push: store reg[x] in memory[previous SP] and SP-=4
-void push(unsigned int rnum) {
-  store(rnum,REG_SP,0);
-  reg[REG_SP] -= 4;
-  if(print_debug)
-    printf(" => SP -= 4\n");
-  return;
-}
+//PC+4をlink stackにPUSH,POP
+void push_link(){
+  link_stack[link_sp] = pc+4;
+  link_sp++;
+};
 
-//push: load reg[x] from memory[previous SP] and SP+=4
-void pop(unsigned int rnum) {
-  load(rnum,REG_SP,0);
-  reg[REG_SP] += 4;
-  if(print_debug)
-    printf(" => SP += 4\n");
-  return;
-}
-*/
-void switch_num(int *x,int *y) {
-  int z = *x;
-  *x = *y;
-  *y = z;
-  return;
+void pop_link(){
+  if(link_sp<=0) {
+    stop = 1;
+    printf("link stack is empty\n");
+  } else {
+    link_sp--;
+    pc = link_stack[link_sp];
+  }
 }
 
 //コード一行を実行
@@ -217,17 +206,17 @@ int execute(unsigned int op) {
   case OP_JZ://old JEQ
     if(flag[ZF]) {
       pc = o.off_addr26;
-      branch++;
+      branch[OP_JZ]++;
     } else {
-      nbranch++;
+      nbranch[OP_JZ]++;
     }
     break;
   case OP_FJLT:
     if(float_flag[0] == FLT) {
       pc = o.off_addr26;
-      branch++;
+      branch[OP_FJLT]++;
     } else {
-      nbranch++;
+      nbranch[OP_FJLT]++;
     }
     break;
   case OP_FADD:
@@ -258,9 +247,9 @@ int execute(unsigned int op) {
   case OP_FJEQ:
     if(float_flag[0] == FEQ) {
       pc = o.off_addr26;
-      branch++;
+      branch[OP_FJEQ]++;
     } else {
-      nbranch++;
+      nbranch[OP_FJEQ]++;
     }
     break;
   case OP_CMP:
@@ -271,20 +260,14 @@ int execute(unsigned int op) {
   case OP_JLINK:
     reg[REG_LR] = pc;
     pc = o.off_addr26;
+    //LINK REGISTERにPUSHする
+    push_link();
     if(print_debug)
       printf(" => LR(=r%d) = %d\n",REG_LR,reg[REG_LR]);
     break;
   case OP_LINK:
-    pc = reg[REG_LR];
+    pop_link();
     break;
-    /*
-  case OP_PUSH:
-    push(ra);
-    break;
-  case OP_POP:
-    pop(ra);
-    break;
-    */
   case OP_OUT:
     printf(" => OUT\n");
     stop = 1;
@@ -293,8 +276,8 @@ int execute(unsigned int op) {
     pc = reg[REG_CL];
     break;
   case OP_JLINKC:
-    //jump and link to reg_clってこういうことだよね？
-    switch_num(&pc,&reg[REG_LR]);
+    push_link();
+    pc = reg[REG_CL];
     break;
   case OP_MV:
     reg[ra]=reg[rb];
@@ -391,9 +374,12 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_RF:
+    scanf("%f",&freg[ra]);
     dprintfr(ra);
     break;
   case OP_RI:
+    scanf("%d",&reg[ra]);
+    setflag(ra);
     dprintr(ra);
     break;
   case OP_PRINT:
