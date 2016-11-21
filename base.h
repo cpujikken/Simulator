@@ -102,7 +102,4 @@ typedef union {
 #define OP_MUL		51
 #define OP_DIV		52
 
-
-
 #endif
-

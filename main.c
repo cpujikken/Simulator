@@ -8,7 +8,7 @@
 int main(int argc,char *argv[])
 {
   char s[20];
-  int i;
+  unsigned int i;
   int line = 0;
   int codesize;
   unsigned int op;
@@ -33,8 +33,8 @@ int main(int argc,char *argv[])
     printf("file open error\n");
     return -1;
   }
-  char outfile[100] = "out_";
-  strcat(outfile,filename);
+  char outfile[100] = "_out";
+  strcat(filename,outfile);
   if((fp_out = fopen(outfile,"wb")) == NULL) {
     printf("file open error\n");
     return -1;
@@ -42,6 +42,10 @@ int main(int argc,char *argv[])
   
   //load codes
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
+    /*
+    print_bin_byte(memory[i]);
+    putchar('\n');
+    */
   }
   fclose(fp);
   codesize = i;//何番地めまで読み込んだのか
@@ -52,7 +56,7 @@ int main(int argc,char *argv[])
   pc = init_pc;
   if(print_debug) {
     printf("read ");
-    print_mem_hex(0);
+    print_mem(0);
     printf("initial IP = %d\n",pc);
   }
   //1行(32bit)ずつ実行
@@ -60,7 +64,7 @@ int main(int argc,char *argv[])
     op = read_mem32(pc);
     if(print_debug)
       printf("IP = %d | operation = ",pc);
-      print_mem_hex(pc);
+      print_mem(pc);
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
       read = 1;
@@ -68,7 +72,7 @@ int main(int argc,char *argv[])
 	scanf("%s",s);
 	if(strcmp(s,"n") == 0) {
 	  read = 0;
-	} else if(strcmp(s,"q") == 0) {
+	} else if(strcmp(s,"q") == 0 || strcmp(s,"quit") == 0) {
 	  return 0;
 	} else if(strcmp(s,"pr") == 0) {
 	  print_reg();
@@ -86,7 +90,17 @@ int main(int argc,char *argv[])
 	  scanf("%d",&num);
 	  my.i = read_mem32(num);
 	  printf("MEMORY[%d] = %f\n",num,my.f);
-	} else {
+	} else if(strcmp(s,"pm_bin") == 0) {
+	  scanf("%d",&num);
+	  print_mem(num);
+	}else if(strcmp(s,"pr_bin") == 0) {
+	  scanf("%d",&num);
+	  print_bin_little((unsigned int)reg[num]);
+	}else if(strcmp(s,"pfr_bin") == 0) {
+	  scanf("%d",&num);
+	  print_bin_little((unsigned int)freg[num]);
+	}
+	else {
 	  printf("undefined command\n");
 	}
       }
@@ -96,7 +110,7 @@ int main(int argc,char *argv[])
 
     //pcがソースコードの長さ以上になったら
     if(pc > codesize) {
-      printf("IP exceeded source code size. Simulate finished.\n");
+      printf("IP exceeded source code size. Simulation finished.\n");
       stop = 1;
     }
     
@@ -107,7 +121,7 @@ int main(int argc,char *argv[])
   print_freg();
   print_pc();
   print_statistics();
-
+  putchar('\n');
   fclose(fp_out);
 
   return 0;

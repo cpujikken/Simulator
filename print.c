@@ -4,20 +4,65 @@
 #include "print.h"
 
 //読み込んだ命令(32bit)を16進数表示 リトルエンディアン用
+//だったのですが、バイナリで表示することにしました。そのほうが見やすいし。
 void print_hex(unsigned int op) {
+  print_bin_little(op);
+  /*
   Mydata myd;
   myd.i = op;
   printf("%x %x %x %x\n",myd.c[3],myd.c[2],myd.c[1],myd.c[0]);
   return;
+  */
 }
 
-//メモリの内容を直接見たい時用
-void print_mem_hex(int addr) {
+//メモリの内容を直接見たい時
+void print_mem(int addr) {
+  printf("MEMORY[%d] = ",addr);
+  print_bin_big(addr);
+  /*
   printf("MEMORY[%d] = %x %x %x %x\n",addr,
 	 memory[addr],memory[addr+1],memory[addr+2],memory[addr+3]);
   return;
+  */
 }
-void print_to_file(int rnum) {
+
+//1バイトをバイナリ表示
+void print_bin_byte(unsigned char x){
+  int i;
+  unsigned char y = 0b10000000;
+  for(i=0;i<8;i++) {
+    if(x&y) {
+      putchar('1');
+    } else {
+      putchar('0');
+    }
+    y = y >> 1;
+  }
+}
+
+//リトルエンディアンの32bitデータxをビッグエンディアンに直してバイナリ表示
+void print_bin_little(unsigned int x){
+  Mydata myd;
+  myd.i = x;
+  int i;
+  for(i=3;i<=0;i--){
+    print_bin_byte(myd.c[i]);
+    putchar(' ');
+  }
+  putchar('\n');
+}
+
+//メモリの内容を直接みたいとき
+void print_bin_big(unsigned int x){
+  int i;
+  for(i=0;i<=3;i++){
+    print_bin_byte(memory[x+i]);
+    putchar(' ');
+  }
+  putchar('\n');
+}
+  
+void print_to_file(unsigned int rnum) {
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
   fwrite((void *)(reg + rnum),sizeof(int),1,fp_out);
@@ -64,6 +109,7 @@ void print_pc() {
 }
 
 void print_link_stack();
+
 
 //統計情報をプリントアウト
 void print_statistics() {
