@@ -37,7 +37,7 @@ unsigned int read_mem32(int mem_addr) {
   return myd.i;
 }
 
-//命令をオペコードとに分解
+//命令を成分ごとに分解
 Operation parse(unsigned int op) {
   Operation o;
   //オペコード=上位6bit register:5bit for each
@@ -45,7 +45,7 @@ Operation parse(unsigned int op) {
   o.opr1 = (op >> 21) & 0b11111;
   o.opr2 = (op >> 16) & 0b11111;
   o.opr3 = (op >> 11) & 0b11111;
-  o.const16 = (short)((op >> 2) & 0b1111111111111111);//?
+  o.const16 = (short)(op & 0xffff);//18biit残ってると誤解してました
   o.bits5 = (op >> 13) & 0b11111;
   o.off_addr26 = op & 0x3ffffff;//lower 26bit
   unsigned int hojo = op & 0x1fffff;//lower21bit.Whether sign bit is 1 or 0?
@@ -305,6 +305,7 @@ int execute(unsigned int op) {
     break;
   case OP_DEC:
     reg[ra] = reg[ra] - 1;
+    dprintr(ra);
     break;
   case OP_INC1:
     reg[ra] = reg[rb] + 1;
@@ -357,8 +358,10 @@ int execute(unsigned int op) {
   case OP_XOR:
     reg[ra] = (reg[rb] ^ reg[rc]);
     setflag(ra);
+    /*
     if(print_debug)
       printf(" => r%d = %d\n",ra,reg[ra]);
+    */
     break;
   case OP_FMV:
     freg[ra] = freg[rb];

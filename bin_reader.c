@@ -29,16 +29,18 @@ int main(int argc,char *argv[])
     return -1;
   }
   //load codes
+  printf("0\t: ");
   for(i=0;fread(buf,sizeof(unsigned char),1,fp) > 0;i++) {
     print_bin_byte(buf[0]);
     if(i%4!=3) {
       putchar(' ');
     } else {
       putchar('\n');
+      printf("%d\t: ",i+1);
     }
   }
-  if(i%4!=0)
-    putchar('\n');
+  //  if(i%4!=0)
+  putchar('\n');
   fclose(fp);
   return 0;
 }
