@@ -154,6 +154,103 @@ void pop_link(){
   }
 }
 
+void print_op(Operation o,Ldst l) {
+  if(print_debug == 0) 
+    return;
+  unsigned int ra = o.opr1;
+  unsigned int rb = o.opr2;
+  unsigned int rc = o.opr3;
+
+  //命令名を表示する
+  printf("operation: ");
+  print_opc(o.opc);
+  putchar(' ');
+
+  //オペコードによる場合分け
+  switch (o.opc) {
+  case OP_NOP:
+  case OP_JLINK:
+  case OP_LINK:
+  case OP_OUT:
+  case OP_JC:
+  case OP_JLINKC:
+    break;
+  case OP_ADD:
+  case OP_SUB:
+  case OP_XOR:
+  case OP_SL:
+  case OP_SR:
+    printf("%%r%d,%%r%d,%%r%d",ra,rb,rc);
+    break;
+  case OP_ADDI:
+  case OP_LDR:
+  case OP_SDR:
+    printf("%%r%d,%%r%d,%d",ra,rb,o.const16);
+    break;
+  case OP_HALF:
+  case OP_FOUR:
+  case OP_CMP:
+  case OP_MV:
+  case OP_NEG2:
+  case OP_INC1:
+  case OP_DEC1:
+    printf("%%r%d,%%r%d",ra,rb);
+    break;
+  case OP_J:
+  case OP_JZ:
+  case OP_FJLT:
+  case OP_FJEQ:
+    printf("%d",o.off_addr26);
+    break;
+  case OP_FADD:
+  case OP_FSUB:
+  case OP_FMUL:
+  case OP_FDIV:
+    printf("%%fr%d,%%fr%d,%%fr%d",ra,rb,rc);
+    break;
+  case OP_FCMP:
+  case OP_FNEG2:
+  case OP_FMV:
+  case OP_FABS:
+    printf("%%fr%d,%%fr%d",ra,rb);
+    break;
+  case OP_NEG1:
+  case OP_INC:
+  case OP_DEC:
+  case OP_RI:
+  case OP_PRINT:
+    printf("%%r%d",ra);
+  case OP_FNEG1:
+  case OP_RF:
+    printf("%%fr%d",ra);
+    break;
+  case OP_MVI:
+    printf("%%r%d,%d",ra,o.off21);
+    break;
+  case OP_LDD:
+  case OP_SDD:
+    printf("%%r%d,%%r%d,%d,%%r%d",l.rd,l.rs,l.size4,l.ro);
+    break;
+  case OP_LDA:
+  case OP_SDA:
+    printf("%%r%d,%d",l.rd,l.addr21);
+    break;
+  case OP_FLDR:
+  case OP_FSDR:
+    printf("%%fr%d,%%r%d,%d",ra,rb,o.const16);
+    break;
+  case OP_FLDD:
+  case OP_FSDD:
+    printf("%%fr%d,%%fr%d,%d,%%r%d",l.rd,l.rs,l.size4,l.ro);
+    break;
+  case OP_FLDA:
+  case OP_FSDA:
+    printf("%%fr%d,%d",l.rd,l.addr21);
+    break;
+  }
+  putchar('\n');
+}
+
 //コード一行を実行
 int execute(unsigned int op) {
   int status;
@@ -163,11 +260,13 @@ int execute(unsigned int op) {
   unsigned int rc = o.opr3;
   Ldst l = parse_ldst(op);
   //命令名を表示する
+  /*
   if(print_debug) {
     printf("operation name: ");
     print_opc(o.opc);
     printf("\n");
-  }
+    }*/
+  print_op(o,l);
   //命令使用回数をカウント
   used[o.opc]++;
 
@@ -320,7 +419,8 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_LDR:
-    load(l.rd,reg[l.rs]+l.off16);
+    //load(l.rd,reg[l.rs]+l.off16);
+    load(ra,reg[rb]+o.const16);
     break;
   case OP_LDD:
     load(l.rd,reg[l.rs] + l.ro * l.size4);
@@ -329,7 +429,8 @@ int execute(unsigned int op) {
     load(l.rd,l.addr21);
     break;
   case OP_SDR:
-    store(l.rd,reg[l.rs]+l.off16);
+    //store(l.rd,reg[l.rs]+l.off16);
+    store(ra,reg[rb]+o.const16);
     break;
   case OP_SDD:
     store(l.rd,reg[l.rs] + l.ro * l.size4);
@@ -338,7 +439,8 @@ int execute(unsigned int op) {
     store(l.rd,l.addr21);
     break;
   case OP_FLDR:
-    fload(l.rd,reg[l.rs]+l.off16);
+    //fload(l.rd,reg[l.rs]+l.off16);
+    fload(ra,reg[rb]+o.const16);
     break;
   case OP_FLDD:
     fload(l.rd,reg[l.rs] + l.ro * l.size4);
@@ -347,7 +449,8 @@ int execute(unsigned int op) {
     fload(l.rd,l.addr21);
     break;
   case OP_FSDR:
-    fstore(l.rd,reg[l.rs]+l.off16);
+    //fstore(l.rd,reg[l.rs]+l.off16);
+    fstore(ra,reg[rb]+o.const16);
     break;
   case OP_FSDD:
     fstore(l.rd,reg[l.rs] + l.ro * l.size4);

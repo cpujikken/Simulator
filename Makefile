@@ -14,4 +14,4 @@ rdbin: bin_reader.c
 
 
 clean:
-	rm $(TARGET)
+	rm $(TARGET) wrbin rdbin
