@@ -45,7 +45,7 @@ void print_bin_little(unsigned int x){
   Mydata myd;
   myd.i = x;
   int i;
-  for(i=3;i<=0;i--){
+  for(i=3;i>=0;i--){
     print_bin_byte(myd.c[i]);
     putchar(' ');
   }
@@ -66,7 +66,10 @@ void print_to_file(unsigned int rnum) {
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
   fwrite((void *)(reg + rnum),sizeof(int),1,fp_out);
-  return;
+  if(print_debug) {
+    printf(" => print out (in little endian) ");
+    print_bin_little(reg[rnum]);
+  }
 }
 
 //デバッグ情報表示モードのときのみ

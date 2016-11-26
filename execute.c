@@ -11,7 +11,7 @@ typedef struct {
   unsigned int opr3;
   short const16; //off16も同じ
   unsigned int bits5;
-  unsigned int off_addr26;//+-はどうやって...？
+  unsigned int off_addr26;//符号無しで良くなった
   int off21; //SIGNED!!!
 } Operation;
 
@@ -140,7 +140,11 @@ int fstore(unsigned int rnum,unsigned int addr) {
 
 //PC+4をlink stackにPUSH,POP
 void push_link(){
-  link_stack[link_sp] = pc+4;
+  link_stack[link_sp] = pc;//関数実行時にはもうPC+4されてるのでここはpc+4ではない
+  if(print_debug) {
+    printf("LINK_STACK[%d] = %d\n",link_sp*4,link_stack[link_sp]);
+    //printf("link stack pointer = %d\n",link_sp*4+4);
+  }
   link_sp++;
 };
 
@@ -169,7 +173,6 @@ void print_op(Operation o,Ldst l) {
   //オペコードによる場合分け
   switch (o.opc) {
   case OP_NOP:
-  case OP_JLINK:
   case OP_LINK:
   case OP_OUT:
   case OP_JC:
@@ -200,6 +203,7 @@ void print_op(Operation o,Ldst l) {
   case OP_JZ:
   case OP_FJLT:
   case OP_FJEQ:
+  case OP_JLINK:
     printf("%d",o.off_addr26);
     break;
   case OP_FADD:
@@ -220,6 +224,7 @@ void print_op(Operation o,Ldst l) {
   case OP_RI:
   case OP_PRINT:
     printf("%%r%d",ra);
+    break;
   case OP_FNEG1:
   case OP_RF:
     printf("%%fr%d",ra);
@@ -357,12 +362,10 @@ int execute(unsigned int op) {
     }
     break;
   case OP_JLINK:
-    reg[REG_LR] = pc;
-    pc = o.off_addr26;
     //LINK REGISTERにPUSHする
     push_link();
-    if(print_debug)
-      printf(" => LR(=r%d) = %d\n",REG_LR,reg[REG_LR]);
+    //reg[REG_LR] = pc;
+    pc = o.off_addr26;
     break;
   case OP_LINK:
     pop_link();
