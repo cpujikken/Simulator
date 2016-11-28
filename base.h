@@ -30,9 +30,7 @@ extern unsigned int link_stack[];
 extern unsigned int link_sp;
 
 //デバッグ、統計情報用
-extern int mode_step;
-extern int print_debug;
-extern int stop;
+extern int stop;//実行を中止(実行を完了したときもこれを呼ぶ)
 extern int used[];//各命令が使われた回数
 extern int branch[];//条件分岐で分岐したか
 extern int nbranch[];//否か
@@ -45,7 +43,6 @@ typedef union {
   int si;
   float f;
 } Mydata;
-
 
 //オペコード
 #define OP_NOP		0

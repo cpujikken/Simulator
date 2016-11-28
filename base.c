@@ -15,8 +15,6 @@ unsigned int link_sp = 0;
 
 
 //for debug
-int mode_step = 0;
-int print_debug = 1;//命令実行ごとにデバッグの情報を表示するか
 int stop = 0;//コードの実行を中止/終了
 int used[NUM_OF_OP];
 int branch[NUM_OF_OP];

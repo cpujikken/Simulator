@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "define.h"
 #include "base.h"
 #include "print.h"
 #include "execute.h"
@@ -151,7 +152,8 @@ void push_link(){
 void pop_link(){
   if(link_sp<=0) {
     stop = 1;
-    printf("link stack is empty\n");
+    if(print_debug)
+      printf("link stack is empty\n");
   } else {
     link_sp--;
     pc = link_stack[link_sp];

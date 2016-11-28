@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "define.h"
 #include "base.h"
 #include "print.h"
 
@@ -65,10 +66,23 @@ void print_bin_big(unsigned int x){
 void print_to_file(unsigned int rnum) {
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
-  fwrite((void *)(reg + rnum),sizeof(int),1,fp_out);
-  if(print_debug) {
-    printf(" => print out (in little endian) ");
-    print_bin_little(reg[rnum]);
+  if(print_little) {
+    fwrite((void *)(reg + rnum),sizeof(int),1,fp_out);
+    if(print_debug) {
+      printf(" => print out (in little endian) ");
+      print_bin_little(reg[rnum]);
+    }
+  } else {
+    Mydata myd;
+    myd.i = reg[rnum];
+    int i;
+    for(i=3;i>=0;i--){
+      fwrite((void *)(myd.c + i),sizeof(char),1,fp_out);
+    }
+    if(print_debug) {
+      printf(" => print out (in big endian) ");
+      print_bin_little(reg[rnum]);
+    }
   }
 }
 
@@ -121,7 +135,7 @@ void print_statistics() {
   for(i=0;i<NUM_OF_OP;i++) {
     if(used[i]>0) {
       print_opc(i);
-      printf(":%d times,",used[i]);
+      printf(":%d times\n",used[i]);
     }
   }
 
@@ -129,7 +143,8 @@ void print_statistics() {
   for(i=0;i<NUM_OF_OP;i++) {
     if(branch[i] > 0 || nbranch[i] > 0) {
       print_opc(i);
-      printf(" -> branched:%d times, not branched:%d times\n",branch[i],nbranch[i]);
+      printf(" -> branched:%d times, not branched:%d times\n",
+	     branch[i],nbranch[i]);
     }
   }
 }

@@ -1,6 +1,6 @@
 TARGET= bsim
 CC = gcc
-SOURCES = base.c print.c execute.c main.c
+SOURCES = define.c base.c print.c execute.c main.c
 
 $(TARGET): $(SOURCES)
 	$(CC) -o $@ $^

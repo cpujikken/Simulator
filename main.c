@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "define.h"
 #include "base.h"
 #include "print.h"
 #include "execute.h"
@@ -35,7 +36,7 @@ int main(int argc,char *argv[])
   }
   char outfile[100] = "_out";
   strcat(filename,outfile);
-  if((fp_out = fopen(outfile,"wb")) == NULL) {
+  if((fp_out = fopen(filename,"wb")) == NULL) {
     printf("file open error\n");
     return -1;
   }
@@ -62,9 +63,10 @@ int main(int argc,char *argv[])
   //1行(32bit)ずつ実行
   while(stop == 0) {
     op = read_mem32(pc);
-    if(print_debug)
+    if(print_debug) {
       printf("IP = %d | operation = ",pc);
       print_mem(pc);
+    }
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
       read = 1;
@@ -117,11 +119,17 @@ int main(int argc,char *argv[])
   }
   
   //最後にレジスタ等を表示
-  print_reg();
-  print_freg();
-  print_pc();
-  print_statistics();
-  putchar('\n');
+  if(print_debug) {
+    print_reg();
+    print_freg();
+    print_pc();
+    putchar('\n');
+  }
+
+  //統計情報を表示
+  if(print_stat)
+    print_statistics();
+
   fclose(fp_out);
 
   return 0;
