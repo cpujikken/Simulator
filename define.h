@@ -1,8 +1,10 @@
 #ifndef _DEFINE_H_
 #define _DEFINE_H_
 //設定の変更はdefine.cで行ってください
+//ヘッダファイルではグローバル変数は宣言できないらしいです
 extern int print_debug;
+extern int print_raw;
+extern int print_stat;
 extern int mode_step;
 extern int print_little;
-extern int print_stat;
 #endif

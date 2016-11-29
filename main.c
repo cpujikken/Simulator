@@ -117,7 +117,9 @@ int main(int argc,char *argv[])
     }
     
   }
-  
+
+  putchar('\n');
+
   //最後にレジスタ等を表示
   if(print_debug) {
     print_reg();
@@ -127,9 +129,9 @@ int main(int argc,char *argv[])
   }
 
   //統計情報を表示
-  if(print_stat)
+  if(print_stat) {
     print_statistics();
-
+  }
   fclose(fp_out);
 
   return 0;

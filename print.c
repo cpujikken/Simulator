@@ -62,8 +62,24 @@ void print_bin_big(unsigned int x){
   }
   putchar('\n');
 }
-  
+
 void print_to_file(unsigned int rnum) {
+  //標準出力に出力する場合
+  if(print_debug==0) {
+    if(print_raw){
+      printf("%d\n",reg[rnum]);
+    } else {
+      Mydata myd;
+      myd.i = reg[rnum];
+      int i;
+      for(i=3;i>=0;i--){
+	putchar(myd.c[i]);
+      }
+    }
+
+    return;
+  }
+
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
   if(print_little) {
@@ -125,8 +141,8 @@ void print_pc() {
   return;
 }
 
+//未使用
 void print_link_stack();
-
 
 //統計情報をプリントアウト
 void print_statistics() {
@@ -193,6 +209,7 @@ void print_opc(unsigned int opcode) {
     break;
   case OP_FCMP:
     strcpy(o,"FCMP");  
+    break;
   case OP_FJEQ:
     strcpy(o,"FJEQ");
     break;
@@ -237,7 +254,7 @@ void print_opc(unsigned int opcode) {
     break;
   case OP_INC1:
     strcpy(o,"INC1");
-   break;
+    break;
   case OP_DEC1:
     strcpy(o,"DEC1");
     break;
@@ -285,6 +302,7 @@ void print_opc(unsigned int opcode) {
     break;
   case OP_FMV:
     strcpy(o,"FMV");
+    break;
   case OP_SL:
     strcpy(o,"SL");
     break;
