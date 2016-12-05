@@ -17,8 +17,10 @@ int main(int argc,char *argv[])
   int read;//ステップ実行用
 
   if(argc > 1) {
+    //ステップ実行モード
     if(argv[1][0] == '-' && argv[1][1] == 's') {
       mode_step = 1;
+      print_debug = 1;
       if(argc > 2) {
 	filename = argv[2];
       }

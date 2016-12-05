@@ -266,13 +266,8 @@ int execute(unsigned int op) {
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
   Ldst l = parse_ldst(op);
-  //命令名を表示する
-  /*
-  if(print_debug) {
-    printf("operation name: ");
-    print_opc(o.opc);
-    printf("\n");
-    }*/
+
+  //命令を表示
   print_op(o,l);
   //命令使用回数をカウント
   used[o.opc]++;
@@ -344,10 +339,16 @@ int execute(unsigned int op) {
   case OP_FCMP:
     if(freg[ra] > freg[rb]) {
       float_flag[0] = FGT;
+      if(print_debug)
+	printf("%f > %f\n => FGT\n",freg[ra],freg[rb]);
     } else if(freg[ra] < freg[rb]) {
       float_flag[0] = FLT;
+      if(print_debug)
+	printf("%f < %f\n => FLT\n",freg[ra],freg[rb]);
     } else {
       float_flag[0] = FEQ;
+      if(print_debug)
+	printf("%f = %f\n => FEQ\n",freg[ra],freg[rb]);
     }
     break;
   case OP_FJEQ:
@@ -359,8 +360,15 @@ int execute(unsigned int op) {
     }
     break;
   case OP_CMP:
-    if(reg[ra] < reg[rb]) {
+    if(reg[ra] == reg[rb]) {
+      flag[ZF] = 1;
+      if(print_debug)
+	{
+	  printf(" %d == %d => set ZF\n",reg[ra],reg[rb]);
+	}
+	} else /*if (reg[ra] < reg[rb])*/ {
       flag[ZF] = 0;
+      printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
   case OP_JLINK:
@@ -466,10 +474,7 @@ int execute(unsigned int op) {
   case OP_XOR:
     reg[ra] = (reg[rb] ^ reg[rc]);
     setflag(ra);
-    /*
-    if(print_debug)
-      printf(" => r%d = %d\n",ra,reg[ra]);
-    */
+    //dprintr(ra);
     break;
   case OP_FMV:
     freg[ra] = freg[rb];
@@ -485,10 +490,12 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_RF:
+    printf("input to %%fr%d >",ra);
     scanf("%f",&freg[ra]);
     dprintfr(ra);
     break;
   case OP_RI:
+    printf("input to %%r%d >",ra);
     scanf("%d",&reg[ra]);
     setflag(ra);
     dprintr(ra);
