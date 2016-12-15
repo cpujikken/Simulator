@@ -20,4 +20,4 @@ int mode_step = 0;
 int print_little = 1;
 //レジスタやメモリの初期値をランダムにします。
 //初期値が0でなくても正しく実行されるかのテストに使用。
-int init_randomize = 1;
+int init_randomize = 0;
