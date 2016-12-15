@@ -13,5 +13,6 @@ void print_reg();
 void print_freg();
 void print_pc();
 void print_opc(unsigned int);
+void print_pointer(void *);
 
 #endif

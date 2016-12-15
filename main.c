@@ -28,8 +28,6 @@ int main(int argc,char *argv[])
       filename = argv[1];
     }
   }
-
-  reg[REG_SP] = INIT_SP;//initial SP
     
   //バイナリモードでファイルオープン
   if((fp = fopen(filename,"rb")) == NULL) {
@@ -42,8 +40,28 @@ int main(int argc,char *argv[])
     printf("file open error\n");
     return -1;
   }
+
+  //HW用、レジスタやメモリの初期値をランダム化
+  //初期値が0埋めされてなくても実行できるかのテスト
+  if(init_randomize) {
+    for(i=0;i<NUM_OF_REG;i++) {
+      reg[i] = rand();
+      freg[i] = (float)rand();
+    }
+    for(i=0;i<MEM_SIZE;i+=4){
+      Mydata myd;
+      myd.i = rand();
+      memory[i] = myd.c[0];
+      memory[i+1] = myd.c[1];
+      memory[i+2] = myd.c[2];
+      memory[i+3] = myd.c[3];
+    }
+  }
+  //ここ、コンパイラが処理するようになったら削除する
+  reg[REG_SP] = INIT_SP;//initial SP
   
-  //load codes
+  
+  //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
     /*
     print_bin_byte(memory[i]);
@@ -103,6 +121,20 @@ int main(int argc,char *argv[])
 	}else if(strcmp(s,"pfr_bin") == 0) {
 	  scanf("%d",&num);
 	  print_bin_little((unsigned int)freg[num]);
+	}
+	//シミュレータのデバッグ用。ポインタ表示機能
+	else if(strcmp(s,"pp_r") == 0) {
+	  scanf("%d",&num);
+	  printf("&%%r%d = ",num);
+	  print_pointer((void *)(reg+num));
+	}else if(strcmp(s,"pp_fr") == 0) {
+	  scanf("%d",&num);
+	  printf("&%%fr%d = ",num);
+	  print_pointer((void *)(freg+num));
+	}else if(strcmp(s,"pp_mem") == 0) {
+	  scanf("%d",&num);
+	  printf("&memory[%d] = ",num);
+	  print_pointer((void *)(memory+num));
 	}
 	else {
 	  printf("undefined command\n");

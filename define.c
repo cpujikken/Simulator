@@ -6,7 +6,7 @@
 
 //実行中の命令名など、デバッグ用の情報を表示する
 //0にすると、PRINT命令は標準出力に(charで)出力するようになる
-int print_debug = 0;
+int print_debug = 1;
 
 //PRINT命令の出力をintで表示(print_debug=0の時のみ有効)
 int print_raw = 0;
@@ -18,3 +18,6 @@ int mode_step = 0;
 //PRINTでの出力のバイトオーダをリトルエンディアンにする
 //(1推奨,print_debug=0なら無関係)
 int print_little = 1;
+//レジスタやメモリの初期値をランダムにします。
+//初期値が0でなくても正しく実行されるかのテストに使用。
+int init_randomize = 1;

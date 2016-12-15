@@ -165,6 +165,12 @@ void print_statistics() {
   }
 }
 
+//シミュレータのデバッグ用、レジスタやメモリが指すポインタを表示
+void print_pointer(void *p){
+  printf("%10p\n",p);
+};
+
+//命令名を表示
 void print_opc(unsigned int opcode) {
   char o[10];
   switch (opcode) {
