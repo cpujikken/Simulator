@@ -59,7 +59,7 @@ int main(int argc,char *argv[])
   }
   //ここ、コンパイラが処理するようになったら削除する
   reg[REG_SP] = INIT_SP;//initial SP
-  
+  reg[REG_HP] = INIT_HP;
   
   //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
