@@ -327,6 +327,9 @@ void print_opc(unsigned int opcode) {
   case OP_FABS:
     strcpy(o,"FABS");
     break;
+  case OP_JLINK_PRIME:
+    strcpy(o,"JLINK\'");
+    break;
   default:
     strcpy(o,"???");
     break;

@@ -57,9 +57,11 @@ int main(int argc,char *argv[])
       memory[i+3] = myd.c[3];
     }
   }
-  //ここ、コンパイラが処理するようになったら削除する
+  //SP,HPはコンパイラがロードするようになった
+  /*
   reg[REG_SP] = INIT_SP;//initial SP
   reg[REG_HP] = INIT_HP;
+  */
   
   //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {

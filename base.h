@@ -101,5 +101,6 @@ typedef union {
 #define OP_FABS		50
 #define OP_MUL		51
 #define OP_DIV		52
+#define OP_JLINK_PRIME	53
 
 #endif

@@ -29,7 +29,7 @@ typedef struct {
 
 //メモリから32bitをunsigned int型で読み込む
 //学科pcはリトルエンディアンなので、後ろから読み込む必要がある
-unsigned int read_mem32(int mem_addr) {
+unsigned int read_mem32(unsigned int mem_addr) {
   Mydata myd;
   int i;
   for (i = 0;i < 4;i++) {
@@ -46,7 +46,7 @@ Operation parse(unsigned int op) {
   o.opr1 = (op >> 21) & 0b11111;
   o.opr2 = (op >> 16) & 0b11111;
   o.opr3 = (op >> 11) & 0b11111;
-  o.const16 = (short)(op & 0xffff);//18biit残ってると誤解してました
+  o.const16 = (short)(op & 0xffff);
   o.bits5 = (op >> 13) & 0b11111;
   o.off_addr26 = op & 0x3ffffff;//lower 26bit
   unsigned int hojo = op & 0x1fffff;//lower21bit.Whether sign bit is 1 or 0?
@@ -144,7 +144,6 @@ void push_link(){
   link_stack[link_sp] = pc;//関数実行時にはもうPC+4されてるのでここはpc+4ではない
   if(print_debug) {
     printf("LINK_STACK[%d] = %d\n",link_sp*4,link_stack[link_sp]);
-    //printf("link stack pointer = %d\n",link_sp*4+4);
   }
   link_sp++;
 };
@@ -179,6 +178,7 @@ void print_op(Operation o,Ldst l) {
   case OP_OUT:
   case OP_JC:
   case OP_JLINKC:
+  case OP_JLINK_PRIME:
     break;
   case OP_ADD:
   case OP_SUB:
@@ -255,6 +255,7 @@ void print_op(Operation o,Ldst l) {
     printf("%%fr%d,%d",l.rd,l.addr21);
     break;
   }
+  
   putchar('\n');
 }
 
@@ -372,9 +373,8 @@ int execute(unsigned int op) {
     }
     break;
   case OP_JLINK:
-    //LINK REGISTERにPUSHする
-    push_link();
-    //reg[REG_LR] = pc;
+    //旧仕様のバイナリとの互換のため残してあります
+    push_link();//LINK REGISTERにPUSHする
     pc = o.off_addr26;
     break;
   case OP_LINK:
@@ -385,11 +385,12 @@ int execute(unsigned int op) {
     stop = 1;
     break;
   case OP_JC:
-    pc = reg[REG_CL];
+    pc = read_mem32(reg[REG_CL]);//仕様変更前はpc = reg[REG_CL];だった
     break;
   case OP_JLINKC:
+    //旧仕様のバイナリとの互換のため残してあります
     push_link();
-    pc = reg[REG_CL];
+    pc = read_mem32(reg[REG_CL]);//仕様変更前はpc = reg[REG_CL];だった    
     break;
   case OP_MV:
     reg[ra]=reg[rb];
@@ -432,7 +433,6 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_LDR:
-    //load(l.rd,reg[l.rs]+l.off16);
     load(ra,reg[rb]+o.const16);
     break;
   case OP_LDD:
@@ -442,7 +442,6 @@ int execute(unsigned int op) {
     load(l.rd,l.addr21);
     break;
   case OP_SDR:
-    //store(l.rd,reg[l.rs]+l.off16);
     store(ra,reg[rb]+o.const16);
     break;
   case OP_SDD:
@@ -452,7 +451,6 @@ int execute(unsigned int op) {
     store(l.rd,l.addr21);
     break;
   case OP_FLDR:
-    //fload(l.rd,reg[l.rs]+l.off16);
     fload(ra,reg[rb]+o.const16);
     break;
   case OP_FLDD:
@@ -462,7 +460,6 @@ int execute(unsigned int op) {
     fload(l.rd,l.addr21);
     break;
   case OP_FSDR:
-    //fstore(l.rd,reg[l.rs]+l.off16);
     fstore(ra,reg[rb]+o.const16);
     break;
   case OP_FSDD:
@@ -474,7 +471,6 @@ int execute(unsigned int op) {
   case OP_XOR:
     reg[ra] = (reg[rb] ^ reg[rc]);
     setflag(ra);
-    //dprintr(ra);
     break;
   case OP_FMV:
     freg[ra] = freg[rb];
@@ -511,6 +507,10 @@ int execute(unsigned int op) {
     }
     dprintfr(ra);
     break;
+  case OP_JLINK_PRIME:
+    push_link();
+    break;
+    
   default:
     printf("undefined operation\n");
     stop = 1;
