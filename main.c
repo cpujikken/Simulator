@@ -1,10 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "define.h"
 #include "base.h"
 #include "print.h"
 #include "execute.h"
+
+double gettime() {
+  struct timeval tv;
+  gettimeofday(&tv,NULL);
+  return ((double)(tv.tv_sec) + (double)(tv.tv_usec) * 0.001 * 0.001);
+}
+
 
 int main(int argc,char *argv[])
 {
@@ -15,6 +23,9 @@ int main(int argc,char *argv[])
   unsigned int op;
   int num;//ステップ実行用
   int read;//ステップ実行用
+  double t1,t2;//実行時間測定用
+
+  t1 = gettime();
 
   if(argc > 1) {
     //ステップ実行モード
@@ -57,6 +68,7 @@ int main(int argc,char *argv[])
       memory[i+3] = myd.c[3];
     }
   }
+
   //SP,HPはコンパイラがロードするようになった
   /*
   reg[REG_SP] = INIT_SP;//initial SP
@@ -80,7 +92,7 @@ int main(int argc,char *argv[])
   if(print_debug) {
     printf("read ");
     print_mem(0);
-    printf("initial IP = %d\n",pc);
+    printf(" => initial IP = %d\n",pc);
   }
   //1行(32bit)ずつ実行
   while(stop == 0) {
@@ -156,6 +168,8 @@ int main(int argc,char *argv[])
 
   putchar('\n');
 
+  t2 = gettime();
+
   //最後にレジスタ等を表示
   if(print_debug) {
     print_reg();
@@ -164,11 +178,15 @@ int main(int argc,char *argv[])
     putchar('\n');
   }
 
+
   //統計情報を表示
   if(print_stat) {
     print_statistics();
   }
   fclose(fp_out);
+  
+  //実行時間の表示
+  printf("\nelapsed time: %fs\n",t2-t1);
 
   return 0;
 }

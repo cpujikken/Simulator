@@ -8,23 +8,12 @@
 //だったのですが、バイナリで表示することにしました。そのほうが見やすいし。
 void print_hex(unsigned int op) {
   print_bin_little(op);
-  /*
-  Mydata myd;
-  myd.i = op;
-  printf("%x %x %x %x\n",myd.c[3],myd.c[2],myd.c[1],myd.c[0]);
-  return;
-  */
 }
 
 //メモリの内容を直接見たい時
 void print_mem(int addr) {
   printf("MEMORY[%d] = ",addr);
   print_bin_big(addr);
-  /*
-  printf("MEMORY[%d] = %x %x %x %x\n",addr,
-	 memory[addr],memory[addr+1],memory[addr+2],memory[addr+3]);
-  return;
-  */
 }
 
 //1バイトをバイナリ表示
@@ -120,7 +109,7 @@ void print_reg() {
   int i;
   for (i = 0;i < 32;i++) {
     if(reg[i] != 0)
-      printf("r%d = %d, ",i,reg[i]);
+      printf("%%r%d = %d\n",i,reg[i]);
   }
   printf("\n");
   return;
@@ -130,7 +119,7 @@ void print_freg() {
   int i;
   for (i = 0;i < 32;i++) {
     if(freg[i] != 0)
-      printf("fr%d = %f, ",i,freg[i]);
+      printf("%%fr%d = %f\n",i,freg[i]);
   }
   printf("\n");
   return;
@@ -154,7 +143,7 @@ void print_statistics() {
       printf(":%d times\n",used[i]);
     }
   }
-
+  
   //条件分岐回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {
     if(branch[i] > 0 || nbranch[i] > 0) {
@@ -327,8 +316,8 @@ void print_opc(unsigned int opcode) {
   case OP_FABS:
     strcpy(o,"FABS");
     break;
-  case OP_JLINK_PRIME:
-    strcpy(o,"JLINK\'");
+  case OP_SIP:
+    strcpy(o,"SIP");
     break;
   default:
     strcpy(o,"???");

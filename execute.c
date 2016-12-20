@@ -178,7 +178,7 @@ void print_op(Operation o,Ldst l) {
   case OP_OUT:
   case OP_JC:
   case OP_JLINKC:
-  case OP_JLINK_PRIME:
+  case OP_SIP:
     break;
   case OP_ADD:
   case OP_SUB:
@@ -267,6 +267,9 @@ int execute(unsigned int op) {
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
   Ldst l = parse_ldst(op);
+
+  Mydata md;
+  int i;
 
   //命令を表示
   print_op(o,l);
@@ -507,8 +510,13 @@ int execute(unsigned int op) {
     }
     dprintfr(ra);
     break;
-  case OP_JLINK_PRIME:
-    push_link();
+  case OP_SIP:
+    md.i = pc+8;
+    for(i=0;i<4;i++) {
+      memory[reg[REG_SP]+i] = md.c[3-i];
+    }
+    if(print_debug)
+      printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]);
     break;
     
   default:
