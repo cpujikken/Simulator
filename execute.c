@@ -199,6 +199,7 @@ void print_op(Operation o,Ldst l) {
   case OP_NEG2:
   case OP_INC1:
   case OP_DEC1:
+  case OP_CEQ:
     printf("%%r%d,%%r%d",ra,rb);
     break;
   case OP_J:
@@ -383,10 +384,6 @@ int execute(unsigned int op) {
   case OP_LINK:
     pop_link();
     break;
-  case OP_FIN:
-    printf(" => finish\n");
-    stop = 1;
-    break;
   case OP_JC:
     pc = read_mem32(reg[REG_CL]);//仕様変更前はpc = reg[REG_CL];だった
     break;
@@ -472,6 +469,7 @@ int execute(unsigned int op) {
     fstore(l.rd,l.addr21);
     break;
   case OP_XOR:
+    //旧仕様のバイナリとの互換のため残してあります
     reg[ra] = (reg[rb] ^ reg[rc]);
     setflag(ra);
     break;
@@ -518,6 +516,23 @@ int execute(unsigned int op) {
     if(print_debug)
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]);
     break;
+  case OP_FIN:
+    printf(" => finish\n");
+    stop = 1;
+    break;
+  case OP_CEQ:
+    if(reg[ra] == reg[rb]) {
+      flag[ZF] = 1;
+      if(print_debug)
+	{
+	  printf(" %d == %d => set ZF\n",reg[ra],reg[rb]);
+	}
+	} else {
+      flag[ZF] = 0;
+      printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
+    }
+    break;
+    
     
   default:
     printf("undefined operation\n");

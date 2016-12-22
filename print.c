@@ -319,6 +319,9 @@ void print_opc(unsigned int opcode) {
   case OP_FIN:
     strcpy(o,"FIN");
     break;
+  case OP_CEQ:
+    strcpy(o,"CEQ");
+    break;
   default:
     strcpy(o,"???");
     break;

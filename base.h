@@ -102,6 +102,6 @@ typedef union {
 #define OP_DIV		52
 #define OP_SIP	        53
 #define OP_FIN		54
-
+#define OP_CEQ          55
 
 #endif
