@@ -217,9 +217,6 @@ void print_opc(unsigned int opcode) {
   case OP_LINK:
     strcpy(o,"LINK");
     break;
-  case OP_OUT:
-    strcpy(o,"OUT");
-    break;
   case OP_JC:
     strcpy(o,"JC");
     break;
@@ -318,6 +315,9 @@ void print_opc(unsigned int opcode) {
     break;
   case OP_SIP:
     strcpy(o,"SIP");
+    break;
+  case OP_FIN:
+    strcpy(o,"FIN");
     break;
   default:
     strcpy(o,"???");

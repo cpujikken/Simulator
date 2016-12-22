@@ -66,7 +66,6 @@ typedef union {
 #define OP_CMP		15
 #define OP_JLINK	16
 #define OP_LINK		17
-#define OP_OUT		18
 #define OP_JC		19
 #define OP_JLINKC	20
 #define OP_MV		21
@@ -102,5 +101,7 @@ typedef union {
 #define OP_MUL		51
 #define OP_DIV		52
 #define OP_SIP	        53
+#define OP_FIN		54
+
 
 #endif

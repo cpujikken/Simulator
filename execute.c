@@ -175,7 +175,7 @@ void print_op(Operation o,Ldst l) {
   switch (o.opc) {
   case OP_NOP:
   case OP_LINK:
-  case OP_OUT:
+  case OP_FIN:
   case OP_JC:
   case OP_JLINKC:
   case OP_SIP:
@@ -364,15 +364,15 @@ int execute(unsigned int op) {
     }
     break;
   case OP_CMP:
-    if(reg[ra] == reg[rb]) {
+    if(reg[ra] >= reg[rb]) {
       flag[ZF] = 1;
       if(print_debug)
 	{
-	  printf(" %d == %d => set ZF\n",reg[ra],reg[rb]);
+	  printf(" %d >= %d => set ZF\n",reg[ra],reg[rb]);
 	}
-	} else /*if (reg[ra] < reg[rb])*/ {
+	} else {
       flag[ZF] = 0;
-      printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
+      printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
   case OP_JLINK:
@@ -383,8 +383,8 @@ int execute(unsigned int op) {
   case OP_LINK:
     pop_link();
     break;
-  case OP_OUT:
-    printf(" => OUT\n");
+  case OP_FIN:
+    printf(" => finish\n");
     stop = 1;
     break;
   case OP_JC:
