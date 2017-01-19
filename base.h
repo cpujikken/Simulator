@@ -4,7 +4,7 @@
 #define MEM_SIZE 67108864
 #define INIT_SP 33554432
 #define INIT_HP 1048576
-#define NUM_OF_OP 52
+#define NUM_OF_OP 56
 #define NUM_OF_REG 32//レジスタの数は32
 #define REG_LR 32//使わない
 #define REG_SP 31//旧30
@@ -37,6 +37,7 @@ extern int stop;//実行を中止(実行を完了したときもこれを呼ぶ)
 extern int used[];//各命令が使われた回数
 extern int branch[];//条件分岐で分岐したか
 extern int nbranch[];//否か
+extern unsigned char mem_used[];//メモリのi番地を使用したか
 
 //byte単位読み込みとかで使う共用体
 typedef union {

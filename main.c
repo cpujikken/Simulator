@@ -77,13 +77,15 @@ int main(int argc,char *argv[])
   
   //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
-    /*
-    print_bin_byte(memory[i]);
-    putchar('\n');
-    */
   }
   fclose(fp);
   codesize = i;//何番地めまで読み込んだのか
+  if(print_stat) {
+    //メモリ使用領域を記録
+    for(i=0;i<codesize/4;i++) {
+      mem_used[i] = 1;
+    }
+  }
 
   //まずプログラム開始番地を読み、PCに代入
   init_pc = read_mem32(0);
@@ -98,7 +100,7 @@ int main(int argc,char *argv[])
   while(stop == 0) {
     op = read_mem32(pc);
     if(print_debug) {
-      printf("IP = %d | operation = ",pc);
+      printf("IP = %d \t\t| ",pc);
       print_mem(pc);
     }
     //ステップ実行の場合,"n","p"などを読む
@@ -128,6 +130,7 @@ int main(int argc,char *argv[])
 	  printf("MEMORY[%d] = %f\n",num,my.f);
 	} else if(strcmp(s,"pm_bin") == 0) {
 	  scanf("%d",&num);
+	  printf("MEMORY[%d] = ",num);
 	  print_mem(num);
 	}else if(strcmp(s,"pr_bin") == 0) {
 	  scanf("%d",&num);
@@ -186,7 +189,7 @@ int main(int argc,char *argv[])
   fclose(fp_out);
   
   //実行時間の表示
-  printf("\nelapsed time: %fs\n",t2-t1);
+  printf("elapsed time: %fs\n",t2-t1);
 
   return 0;
 }

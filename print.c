@@ -12,7 +12,7 @@ void print_hex(unsigned int op) {
 
 //メモリの内容を直接見たい時
 void print_mem(int addr) {
-  printf("MEMORY[%d] = ",addr);
+  //printf("MEMORY[%d] = ",addr);
   print_bin_big(addr);
 }
 
@@ -135,23 +135,36 @@ void print_link_stack();
 
 //統計情報をプリントアウト
 void print_statistics() {
-  int i;
+  int i,j=0;
   //命令使用回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {
     if(used[i]>0) {
       print_opc(i);
-      printf(":%d times\n",used[i]);
+      printf(":\t%d\ttimes\n",used[i]);
+      j+=used[i];
     }
   }
+  printf("dynamic instruction number :\t%d\n",j);
+
   
   //条件分岐回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {
     if(branch[i] > 0 || nbranch[i] > 0) {
       print_opc(i);
-      printf(" -> branched:%d times, not branched:%d times\n",
+      printf(" -> branched : %d times, not branched : %d times\n",
 	     branch[i],nbranch[i]);
     }
   }
+
+  //メモリ使用量をカウント
+  int use=0;
+  for(i=0;i<MEM_SIZE/4;i++) {
+    if(mem_used[i]) {
+      use += 4;
+    }
+  }
+  printf("memory usage : %d Byte (= %f MiB)\n",use,use/1024.0/1024.0);
+
 }
 
 //シミュレータのデバッグ用、レジスタやメモリが指すポインタを表示
@@ -312,6 +325,12 @@ void print_opc(unsigned int opcode) {
     break;
   case OP_FABS:
     strcpy(o,"FABS");
+    break;
+  case OP_MUL:
+    strcpy(o,"MUL");
+    break;
+  case OP_DIV:
+    strcpy(o,"DIV");
     break;
   case OP_SIP:
     strcpy(o,"SIP");

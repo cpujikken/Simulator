@@ -19,8 +19,9 @@ int stop = 0;//コードの実行を中止/終了
 int used[NUM_OF_OP];
 int branch[NUM_OF_OP];
 int nbranch[NUM_OF_OP];
+unsigned char mem_used[MEM_SIZE/4];
 
-char default_file[100] = "binary";
+char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;
 FILE *fp;
 FILE *fp_out;

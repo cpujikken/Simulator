@@ -22,7 +22,6 @@ typedef struct {
   unsigned int rs;
   unsigned int ro;
   unsigned int size4;
-  unsigned int rs_dynamic;
   unsigned int addr21;
 } Ldst;
 
@@ -62,10 +61,9 @@ Ldst parse_ldst(unsigned int op) {
   Ldst l;
   l.rd = (op >> 21) & 0b11111;
   l.off16 = (op >> 5) & 0xffff;
-  l.rs = op & 0b11111;
-  l.ro = (op >> 16) & 0b11111;
-  l.size4 = (op >> 11) & 0b1111;
-  l.rs_dynamic = (op >> 7) & 0b11111;
+  l.rs = (op >> 16) & 0b11111;
+  l.ro = (op >> 7) & 0b11111;
+  l.size4 = (op >> 12) & 0b1111;
   l.addr21 = op & 0x1fffff;
   return l;
 }
@@ -83,11 +81,24 @@ int setflag(int rnum) {
 }
 
 /*
- * ロード
+ * ロードストア
  * メモリにはビッグエンディアンで書かれてるが、レジスタに載せる際は
  * リトルエンディアンにしないと、シミュレータ的にはすごく不便
  */
+//アクセスするメモリの値がおかしい場合は停止
+int isnil(unsigned int addr) {
+  if(addr >= MEM_SIZE) {
+    printf("accessing nil memory(MEMORY[%d])\n",addr);
+    stop = 1;
+    return 1;
+  }
+  return 0;
+}
+
 int load(unsigned int rnum,unsigned int addr) {
+  if(isnil(addr) != 0) {
+    return 1;
+  }
   Mydata md;
   unsigned int i;
   md.i = 0;
@@ -97,11 +108,20 @@ int load(unsigned int rnum,unsigned int addr) {
   reg[rnum] = md.i;
   if(print_debug)
     printf(" => LOADED %d FROM MEMORY[%d]\n",reg[rnum],addr);
+  if(print_stat) {
+    mem_used[addr/4]=1;
+  }  
   return 0;
 }
+
 int fload(unsigned int rnum,int addr) {
+  if(isnil(addr)) {
+    return 1;
+  }
+
   Mydata md;
   int i;
+
   md.f = 0;
   for(i=0;i<4;i++) {
     md.c[3-i] = memory[addr+i];
@@ -109,11 +129,16 @@ int fload(unsigned int rnum,int addr) {
   freg[rnum] = md.f;
   if(print_debug)
     printf(" => LOADED %f FROM MEMORY[%d]\n",freg[rnum],addr);
+  if(print_stat) {
+    mem_used[addr/4]=1;
+  }
   return 0;
 }
 
-//ストア
 int store(unsigned int rnum,int addr) {
+  if(isnil(addr) != 0) {
+    return 1;
+  }
   Mydata md;
   int i;
   
@@ -127,9 +152,12 @@ int store(unsigned int rnum,int addr) {
 }
 
 int fstore(unsigned int rnum,unsigned int addr) {
+  if(isnil(addr)) {
+    return 1;
+  }
+
   Mydata md;
   int i;
-  
   md.f = reg[rnum];
   for(i=0;i<4;i++) {
     memory[addr+i] = md.c[3-i];//リトルエンディアン
@@ -185,6 +213,8 @@ void print_op(Operation o,Ldst l) {
   case OP_XOR:
   case OP_SL:
   case OP_SR:
+  case OP_MUL:
+  case OP_DIV:
     printf("%%r%d,%%r%d,%%r%d",ra,rb,rc);
     break;
   case OP_ADDI:
@@ -294,22 +324,19 @@ int execute(unsigned int op) {
   case OP_ADDI:
     reg[ra] = reg[rb] + o.const16;
     dprintr(ra);
-    //setflag(ra);
     break;
   case OP_HALF:
     reg[ra] = reg[rb] >> 1;
     dprintr(ra);
-    //setflag(ra);
     break;
   case OP_FOUR:
     reg[ra] = reg[rb] << 2;
     dprintr(ra);
-    //setflag(ra);
     break;
   case OP_J:
     pc = o.off_addr26;
     break;
-  case OP_JZ://old JEQ
+  case OP_JZ:
     if(flag[ZF]) {
       pc = o.off_addr26;
       branch[OP_JZ]++;
@@ -508,8 +535,18 @@ int execute(unsigned int op) {
     }
     dprintfr(ra);
     break;
+  case OP_MUL:
+    reg[ra] = reg[rb] * reg[rc];
+    dprintr(ra);
+    break;
+  case OP_DIV:
+    reg[ra] = reg[rb] / reg[rc];
+    dprintr(ra);
+    break;
   case OP_SIP:
-    md.i = pc+8;
+    /*命令セットにはIP+8とあるが、
+      命令実行前にすでにIPに4足してあるのでここは+4*/
+    md.i = pc+4;
     for(i=0;i<4;i++) {
       memory[reg[REG_SP]+i] = md.c[3-i];
     }
