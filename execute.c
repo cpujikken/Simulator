@@ -554,7 +554,11 @@ int execute(unsigned int op) {
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]);
     break;
   case OP_FIN:
-    printf(" => finish\n");
+    if(print_debug==0&&print_to_stdin==1) {
+      putchar('\n');
+    }
+    printf(" => finished by operation FIN\n");
+    
     stop = 1;
     break;
   case OP_CEQ:

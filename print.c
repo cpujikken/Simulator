@@ -53,8 +53,8 @@ void print_bin_big(unsigned int x){
 }
 
 void print_to_file(unsigned int rnum) {
-  //標準出力に出力する場合
-  if(print_debug==0) {
+  //標準出力に出力する場合 <-?
+  if(print_debug==0 && print_to_stdin==1) {
     if(print_raw){
       printf("%d\n",reg[rnum]);
     } else {
@@ -65,7 +65,6 @@ void print_to_file(unsigned int rnum) {
 	putchar(myd.c[i]);
       }
     }
-
     return;
   }
 
