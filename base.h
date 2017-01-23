@@ -18,8 +18,8 @@
 extern int reg[];
 extern float freg[];
 extern char memory[];
-extern int pc;
-extern int init_pc;
+extern unsigned int pc;
+extern unsigned int init_pc;
 extern int lr;
 extern int link;
 extern int flag[];

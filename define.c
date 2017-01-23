@@ -6,7 +6,7 @@
 
 //実行中の命令名など、デバッグ用の情報を表示する
 //0にすると、PRINT命令は標準出力に(charで)出力するようになる
-int print_debug = 0;
+int print_debug = 1;
 
 //PRINT命令の結果を(_outファイルでなく)標準出力に出力(print_debug=0の時のみ有効)
 int print_to_stdin = 0;

@@ -167,25 +167,22 @@ int fstore(unsigned int rnum,unsigned int addr) {
   return 0;
 }
 
-//PC+4をlink stackにPUSH,POP
-void push_link(){
-  link_stack[link_sp] = pc;//関数実行時にはもうPC+4されてるのでここはpc+4ではない
-  if(print_debug) {
-    printf("LINK_STACK[%d] = %d\n",link_sp*4,link_stack[link_sp]);
-  }
-  link_sp++;
-};
-
-void pop_link(){
-  if(link_sp<=0) {
+//ジャンプ デバッグ情報ON時、どこへジャンプしたか表示するUIにした
+void jump(unsigned int j) {
+  pc = j;
+  if(print_debug)
+    printf(" => JUMPED TO %d\n",j);
+  //0番地にジャンプすることはないはずなので、その時は停止する
+  if(pc <= 0) {
+    printf("jumped to wrong address\n");
     stop = 1;
-    if(print_debug)
-      printf("link stack is empty\n");
-  } else {
-    link_sp--;
-    pc = link_stack[link_sp];
   }
 }
+//ジャンプ非成立時の表示
+void nojump() {
+  if(print_debug)
+    printf(" => NO JUMP\n");
+}  
 
 void print_op(Operation o,Ldst l) {
   if(print_debug == 0) 
@@ -197,7 +194,7 @@ void print_op(Operation o,Ldst l) {
   //命令名を表示する
   printf("operation: ");
   print_opc(o.opc);
-  putchar(' ');
+  putchar('\t');
 
   //オペコードによる場合分け
   switch (o.opc) {
@@ -215,12 +212,12 @@ void print_op(Operation o,Ldst l) {
   case OP_SR:
   case OP_MUL:
   case OP_DIV:
-    printf("%%r%d,%%r%d,%%r%d",ra,rb,rc);
+    printf("%%r%d, %%r%d, %%r%d",ra,rb,rc);
     break;
   case OP_ADDI:
   case OP_LDR:
   case OP_SDR:
-    printf("%%r%d,%%r%d,%d",ra,rb,o.const16);
+    printf("%%r%d, %%r%d, $%d",ra,rb,o.const16);
     break;
   case OP_HALF:
   case OP_FOUR:
@@ -230,26 +227,26 @@ void print_op(Operation o,Ldst l) {
   case OP_INC1:
   case OP_DEC1:
   case OP_CEQ:
-    printf("%%r%d,%%r%d",ra,rb);
+    printf("%%r%d, %%r%d",ra,rb);
     break;
   case OP_J:
   case OP_JZ:
   case OP_FJLT:
   case OP_FJEQ:
   case OP_JLINK:
-    printf("%d",o.off_addr26);
+    printf("$%d",o.off_addr26);
     break;
   case OP_FADD:
   case OP_FSUB:
   case OP_FMUL:
   case OP_FDIV:
-    printf("%%fr%d,%%fr%d,%%fr%d",ra,rb,rc);
+    printf("%%fr%d, %%fr%d, %%fr%d",ra,rb,rc);
     break;
   case OP_FCMP:
   case OP_FNEG2:
   case OP_FMV:
   case OP_FABS:
-    printf("%%fr%d,%%fr%d",ra,rb);
+    printf("%%fr%d, %%fr%d",ra,rb);
     break;
   case OP_NEG1:
   case OP_INC:
@@ -263,27 +260,27 @@ void print_op(Operation o,Ldst l) {
     printf("%%fr%d",ra);
     break;
   case OP_MVI:
-    printf("%%r%d,%d",ra,o.off21);
+    printf("%%r%d, $%d",ra,o.off21);
     break;
   case OP_LDD:
   case OP_SDD:
-    printf("%%r%d,%%r%d,%d,%%r%d",l.rd,l.rs,l.size4,l.ro);
+    printf("%%r%d, %%r%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
     break;
   case OP_LDA:
   case OP_SDA:
-    printf("%%r%d,%d",l.rd,l.addr21);
+    printf("%%r%d, $%d",l.rd,l.addr21);
     break;
   case OP_FLDR:
   case OP_FSDR:
-    printf("%%fr%d,%%r%d,%d",ra,rb,o.const16);
+    printf("%%fr%d, %%r%d, $%d",ra,rb,o.const16);
     break;
   case OP_FLDD:
   case OP_FSDD:
-    printf("%%fr%d,%%fr%d,%d,%%r%d",l.rd,l.rs,l.size4,l.ro);
+    printf("%%fr%d, %%fr%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
     break;
   case OP_FLDA:
   case OP_FSDA:
-    printf("%%fr%d,%d",l.rd,l.addr21);
+    printf("%%fr%d, $%d",l.rd,l.addr21);
     break;
   }
   
@@ -334,21 +331,23 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_J:
-    pc = o.off_addr26;
+    jump(o.off_addr26);
     break;
   case OP_JZ:
     if(flag[ZF]) {
-      pc = o.off_addr26;
+      jump(o.off_addr26);
       branch[OP_JZ]++;
     } else {
+      nojump();
       nbranch[OP_JZ]++;
     }
     break;
   case OP_FJLT:
     if(float_flag[0] == FLT) {
-      pc = o.off_addr26;
+      jump(o.off_addr26);
       branch[OP_FJLT]++;
     } else {
+      nojump();
       nbranch[OP_FJLT]++;
     }
     break;
@@ -385,9 +384,10 @@ int execute(unsigned int op) {
     break;
   case OP_FJEQ:
     if(float_flag[0] == FEQ) {
-      pc = o.off_addr26;
+      jump(o.off_addr26);
       branch[OP_FJEQ]++;
     } else {
+      nojump();
       nbranch[OP_FJEQ]++;
     }
     break;
@@ -403,21 +403,13 @@ int execute(unsigned int op) {
       printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
-  case OP_JLINK:
-    //旧仕様のバイナリとの互換のため残してあります
-    push_link();//LINK REGISTERにPUSHする
-    pc = o.off_addr26;
-    break;
   case OP_LINK:
-    pop_link();
+    i = read_mem32(reg[REG_SP]);
+    printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
+    jump(i);
     break;
   case OP_JC:
-    pc = read_mem32(reg[REG_CL]);//仕様変更前はpc = reg[REG_CL];だった
-    break;
-  case OP_JLINKC:
-    //旧仕様のバイナリとの互換のため残してあります
-    push_link();
-    pc = read_mem32(reg[REG_CL]);//仕様変更前はpc = reg[REG_CL];だった    
+    jump(read_mem32(reg[REG_CL]));
     break;
   case OP_MV:
     reg[ra]=reg[rb];

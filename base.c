@@ -4,8 +4,8 @@
 int reg[32];
 float freg[32];
 char memory[MEM_SIZE];//64MB=67108864B
-int pc = 1;
-int init_pc = 0;
+unsigned int pc = 0;
+unsigned int init_pc = 0;
 int lr = 0;
 int link = 0;
 int flag[16];//フラッグや浮動小数点フラッグが16bitというのは再現してない

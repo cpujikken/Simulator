@@ -12,9 +12,8 @@ wrbin: bin_writer.c
 	gcc -o $@ $^
 rdbin: bin_reader.c
 	gcc -o $@ $^
-
-
-
 clean:
-	$(RM) $(PROGRAM) $(rdwrbin)
+	$(RM) $(PROGRAM)
 	find -name "*_out" | xargs $(RM)
+clean_bin:
+	$(RM) $(rdwrbin)
