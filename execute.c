@@ -406,6 +406,7 @@ int execute(unsigned int op) {
   case OP_LINK:
     i = read_mem32(reg[REG_SP]);
     printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
+    reg[REG_SP] = reg[REG_SP] - 4;//pop
     jump(i);
     break;
   case OP_JC:
