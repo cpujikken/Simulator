@@ -400,12 +400,14 @@ int execute(unsigned int op) {
 	}
 	} else {
       flag[ZF] = 0;
-      printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
+      if(print_debug)
+	printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
   case OP_LINK:
-    i = read_mem32(reg[REG_SP]);
-    printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
+    i = read_mem32(reg[REG_SP]-4);//stack pointer-4番地をロード
+    if(print_debug)
+      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
     reg[REG_SP] = reg[REG_SP] - 4;//pop
     jump(i);
     break;
@@ -541,7 +543,7 @@ int execute(unsigned int op) {
       命令実行前にすでにIPに4足してあるのでここは+4*/
     md.i = pc+4;
     for(i=0;i<4;i++) {
-      memory[reg[REG_SP]+i] = md.c[3-i];
+      memory[reg[REG_SP]-4+i] = md.c[3-i];//stack pointer-4番地にストア
     }
     if(print_debug)
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]);
@@ -563,7 +565,8 @@ int execute(unsigned int op) {
 	}
 	} else {
       flag[ZF] = 0;
-      printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
+      if(print_debug)
+	printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
     
