@@ -34,9 +34,18 @@ int main(int argc,char *argv[])
       print_debug = 1;
       if(argc > 2) {
 	filename = argv[2];
+	if(argc > 3) {
+	  start_print = atoi(argv[3]);
+	  if(start_print==0) print_debug = 1;
+	}
       }
     } else {
       filename = argv[1];
+	if(argc > 2) {
+	  start_print = atoi(argv[2]);
+	  if(start_print==0) print_debug = 1;
+	}
+
     }
   }
     

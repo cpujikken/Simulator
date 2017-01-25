@@ -25,12 +25,16 @@ typedef struct {
   unsigned int addr21;
 } Ldst;
 
-
 //メモリから32bitをunsigned int型で読み込む
 //学科pcはリトルエンディアンなので、後ろから読み込む必要がある
 unsigned int read_mem32(unsigned int mem_addr) {
   Mydata myd;
   int i;
+  if(mem_addr >= MEM_SIZE-3) {
+    stop = 1;
+    printf("accessing nil memory(%d)\n",mem_addr);
+    return 0;
+  }
   for (i = 0;i < 4;i++) {
     myd.c[i] = memory[mem_addr + 3 - i];
   }
@@ -80,110 +84,6 @@ int setflag(int rnum) {
   return 0;
 }
 
-/*
- * ロードストア
- * メモリにはビッグエンディアンで書かれてるが、レジスタに載せる際は
- * リトルエンディアンにしないと、シミュレータ的にはすごく不便
- */
-//アクセスするメモリの値がおかしい場合は停止
-int isnil(unsigned int addr) {
-  if(addr >= MEM_SIZE) {
-    printf("accessing nil memory(MEMORY[%d])\n",addr);
-    stop = 1;
-    return 1;
-  }
-  return 0;
-}
-
-int load(unsigned int rnum,unsigned int addr) {
-  if(isnil(addr) != 0) {
-    return 1;
-  }
-  Mydata md;
-  unsigned int i;
-  md.i = 0;
-  for(i=0;i<4;i++) {
-    md.c[3-i] = memory[addr+i]; //ビッグエンディアン->リトルエンディアン
-  }
-  reg[rnum] = md.i;
-  if(print_debug)
-    printf(" => LOADED %d FROM MEMORY[%d]\n",reg[rnum],addr);
-  if(print_stat) {
-    mem_used[addr/4]=1;
-  }  
-  return 0;
-}
-
-int fload(unsigned int rnum,int addr) {
-  if(isnil(addr)) {
-    return 1;
-  }
-
-  Mydata md;
-  int i;
-
-  md.f = 0;
-  for(i=0;i<4;i++) {
-    md.c[3-i] = memory[addr+i];
-  }
-  freg[rnum] = md.f;
-  if(print_debug)
-    printf(" => LOADED %f FROM MEMORY[%d]\n",freg[rnum],addr);
-  if(print_stat) {
-    mem_used[addr/4]=1;
-  }
-  return 0;
-}
-
-int store(unsigned int rnum,int addr) {
-  if(isnil(addr) != 0) {
-    return 1;
-  }
-  Mydata md;
-  int i;
-  
-  md.i = reg[rnum];
-  for(i=0;i<4;i++) {
-    memory[addr+i] = md.c[3-i];
-  }
-  if(print_debug)
-    printf(" => STORED %d TO MEMORY[%d]\n",md.i,addr);
-  return 0;
-}
-
-int fstore(unsigned int rnum,unsigned int addr) {
-  if(isnil(addr)) {
-    return 1;
-  }
-
-  Mydata md;
-  int i;
-  md.f = reg[rnum];
-  for(i=0;i<4;i++) {
-    memory[addr+i] = md.c[3-i];//リトルエンディアン
-  }
-  if(print_debug)
-    printf(" => STORED %d TO MEMORY[%d]\n",md.i,addr);
-  return 0;
-}
-
-//ジャンプ デバッグ情報ON時、どこへジャンプしたか表示するUIにした
-void jump(unsigned int j) {
-  pc = j;
-  if(print_debug)
-    printf(" => JUMPED TO %d\n",j);
-  //0番地にジャンプすることはないはずなので、その時は停止する
-  if(pc <= 0) {
-    printf("jumped to wrong address\n");
-    stop = 1;
-  }
-}
-//ジャンプ非成立時の表示
-void nojump() {
-  if(print_debug)
-    printf(" => NO JUMP\n");
-}  
-
 void print_op(Operation o,Ldst l) {
   if(print_debug == 0) 
     return;
@@ -192,7 +92,7 @@ void print_op(Operation o,Ldst l) {
   unsigned int rc = o.opr3;
 
   //命令名を表示する
-  printf("operation: ");
+  //printf("operation: ");
   print_opc(o.opc);
   putchar('\t');
 
@@ -287,6 +187,113 @@ void print_op(Operation o,Ldst l) {
   putchar('\n');
 }
 
+
+/*
+ * ロードストア
+ * メモリにはビッグエンディアンで書かれてるが、レジスタに載せる際は
+ * リトルエンディアンにしないと、シミュレータ的にはすごく不便
+ */
+//アクセスするメモリの値がおかしい場合は停止
+int isnil(unsigned int addr) {
+  if(addr >= MEM_SIZE) {
+    printf("accessing nil memory(MEMORY[%d])\n",addr);
+    stop = 1;
+    return 1;
+  }
+  return 0;
+}
+
+int load(unsigned int rnum,unsigned int addr) {
+  if(isnil(addr) != 0) {
+    return 1;
+  }
+  Mydata md;
+  unsigned int i;
+  md.i = 0;
+  for(i=0;i<4;i++) {
+    md.c[3-i] = memory[addr+i]; //ビッグエンディアン->リトルエンディアン
+  }
+  reg[rnum] = md.i;
+  if(print_debug)
+    printf(" => LOADED %d FROM MEMORY[%d]\n",reg[rnum],addr);
+  if(print_stat) {
+    mem_used[addr/4]=1;
+  }  
+  return 0;
+}
+
+int fload(unsigned int rnum,int addr) {
+  if(isnil(addr)) {
+    return 1;
+  }
+
+  Mydata md;
+  int i;
+
+  md.f = 0;
+  for(i=0;i<4;i++) {
+    md.c[3-i] = memory[addr+i];
+  }
+  freg[rnum] = md.f;
+  if(print_debug)
+    printf(" => LOADED %f FROM MEMORY[%d]\n",freg[rnum],addr);
+  if(print_stat) {
+    mem_used[addr/4]=1;
+  }
+  return 0;
+}
+
+int store(unsigned int rnum,int addr) {
+  if(isnil(addr) != 0) {
+    return 1;
+  }
+  Mydata md;
+  int i;
+  
+  md.i = reg[rnum];
+  for(i=0;i<4;i++) {
+    memory[addr+i] = md.c[3-i];
+  }
+  if(print_debug)
+    printf(" => STORED %d TO MEMORY[%d]\n",md.i,addr);
+  return 0;
+}
+
+int fstore(unsigned int rnum,unsigned int addr) {
+  if(isnil(addr)) {
+    return 1;
+  }
+
+  Mydata md;
+  int i;
+  md.f = reg[rnum];
+  for(i=0;i<4;i++) {
+    memory[addr+i] = md.c[3-i];//リトルエンディアン
+  }
+  if(print_debug)
+    printf(" => STORED %d TO MEMORY[%d]\n",md.i,addr);
+  return 0;
+}
+
+//ジャンプ デバッグ情報ON時、どこへジャンプしたか表示するUIにした
+void jump(unsigned int j) {
+  //0番地にジャンプすることはないはずなので、その時は停止する
+  if(j <= 0) {
+    printf("jumped to wrong address(%d)",j);
+    printf(" at IP=%d\n",pc);
+    stop = 1;
+    return;
+  }
+  pc = j;
+  if(print_debug)
+    printf(" => JUMPED TO %d\n",j);
+}
+//ジャンプ非成立時の表示
+void nojump() {
+  if(print_debug)
+    printf(" => NO JUMP\n");
+}
+
 //コード一行を実行
 int execute(unsigned int op) {
   int status;
@@ -295,14 +302,15 @@ int execute(unsigned int op) {
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
   Ldst l = parse_ldst(op);
-
+  
   Mydata md;
   int i;
+  //命令使用回数をカウント  
+  used[o.opc]++;
+  dyna++;
 
   //命令を表示
   print_op(o,l);
-  //命令使用回数をカウント
-  used[o.opc]++;
 
   //オペコードによる場合分け
   switch (o.opc) {
@@ -398,16 +406,20 @@ int execute(unsigned int op) {
 	{
 	  printf(" %d >= %d => set ZF\n",reg[ra],reg[rb]);
 	}
-	} else {
+    } else {
       flag[ZF] = 0;
       if(print_debug)
 	printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
   case OP_LINK:
+    i = reg[REG_SP] - 4;
+    if(i < 0) {
+      printf("accessing nil memory(%d) : at IP = %d\n",i,pc);
+    }
     i = read_mem32(reg[REG_SP]-4);//stack pointer-4番地をロード
     if(print_debug)
-      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
+      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
     reg[REG_SP] = reg[REG_SP] - 4;//pop
     jump(i);
     break;
@@ -574,6 +586,11 @@ int execute(unsigned int op) {
   default:
     printf("undefined operation\n");
     stop = 1;
+  }
+
+  //動的命令数が指定回数以上になったらデバッグ情報を表示し始める
+  if(start_print > 0 && print_debug == 0 && dyna >= start_print) {
+    print_debug = 1;
   }
   return 0;
 }

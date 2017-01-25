@@ -134,16 +134,15 @@ void print_link_stack();
 
 //統計情報をプリントアウト
 void print_statistics() {
-  int i,j=0;
+  int i=0;
   //命令使用回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {
     if(used[i]>0) {
       print_opc(i);
       printf(":\t%d\ttimes\n",used[i]);
-      j+=used[i];
     }
   }
-  printf("dynamic instruction number :\t%d\n",j);
+  printf("dynamic instruction number :\t%d\n",dyna);
 
   
   //条件分岐回数をプリント

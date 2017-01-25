@@ -16,10 +16,12 @@ unsigned int link_sp = 0;
 
 //for debug
 int stop = 0;//コードの実行を中止/終了
-int used[NUM_OF_OP];
+int used[NUM_OF_OP];//各命令実行回数
+int dyna = 0;//動的実行命令数
 int branch[NUM_OF_OP];
 int nbranch[NUM_OF_OP];
 unsigned char mem_used[MEM_SIZE/4];
+int start_print = -1;
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;

@@ -35,9 +35,11 @@ extern unsigned int link_sp;
 //デバッグ、統計情報用
 extern int stop;//実行を中止(実行を完了したときもこれを呼ぶ)
 extern int used[];//各命令が使われた回数
+extern int dyna;//動的実行命令数
 extern int branch[];//条件分岐で分岐したか
 extern int nbranch[];//否か
 extern unsigned char mem_used[];//メモリのi番地を使用したか
+extern int start_print;//動的命令数>=start_printになったらデバッグ情報表示開始
 
 //byte単位読み込みとかで使う共用体
 typedef union {
