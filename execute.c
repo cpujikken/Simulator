@@ -3,6 +3,7 @@
 #include "define.h"
 #include "base.h"
 #include "print.h"
+#include "label.h"
 #include "execute.h"
 
 typedef struct {
@@ -184,7 +185,7 @@ void print_op(Operation o,Ldst l) {
     break;
   }
   
-  putchar('\n');
+  //putchar('\n');
 }
 
 
@@ -310,8 +311,12 @@ int execute(unsigned int op) {
   used[o.opc]++;
   dyna++;
 
-  //命令を表示
+  //命令を表示 _labelファイルがあるときはラベル名も表示
   print_op(o,l);
+  if(label_info) {
+    printf(" \t#%s\n",addr2label(pc-4));
+  }
+
 
   //オペコードによる場合分け
   switch (o.opc) {

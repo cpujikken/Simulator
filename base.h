@@ -33,6 +33,7 @@ extern unsigned int link_stack[];
 extern unsigned int link_sp;
 
 //デバッグ、統計情報用
+extern unsigned int codesize;
 extern int stop;//実行を中止(実行を完了したときもこれを呼ぶ)
 extern int used[];//各命令が使われた回数
 extern int dyna;//動的実行命令数

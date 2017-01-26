@@ -5,6 +5,7 @@
 #include "define.h"
 #include "base.h"
 #include "print.h"
+#include "label.h"
 #include "execute.h"
 
 double gettime() {
@@ -19,7 +20,6 @@ int main(int argc,char *argv[])
   char s[20];
   unsigned int i;
   int line = 0;
-  int codesize;
   unsigned int op;
   int num;//ステップ実行用
   int read;//ステップ実行用
@@ -54,13 +54,6 @@ int main(int argc,char *argv[])
     printf("file open error\n");
     return -1;
   }
-  char outfile[100] = "_out";
-  strcat(filename,outfile);
-  if((fp_out = fopen(filename,"wb")) == NULL) {
-    printf("file open error\n");
-    return -1;
-  }
-
   //HW用、レジスタやメモリの初期値をランダム化
   //初期値が0埋めされてなくても実行できるかのテスト
   if(init_randomize) {
@@ -88,6 +81,25 @@ int main(int argc,char *argv[])
     for(i=0;i<codesize/4;i++) {
       mem_used[i] = 1;
     }
+  }
+  
+  //ラベルの情報を読み込む(コードサイズを見てから)
+  char labelname[100] = "\0";
+  strcat(labelname,filename);
+  strcat(labelname,"_label");
+  if((fp_label = fopen(labelname,"r")) == NULL) {
+    printf("label file not found\n");
+  } else {
+    label_info = 1;
+    make_label_list();
+    fclose(fp_label);
+  }
+  //出力用ファイルをオープン
+  char outfile[100] = "_out";
+  strcat(filename,outfile);
+  if((fp_out = fopen(filename,"wb")) == NULL) {
+    printf("file open error\n");
+    return -1;
   }
 
   //まずプログラム開始番地を読み、PCに代入
@@ -169,7 +181,6 @@ int main(int argc,char *argv[])
       printf("IP exceeded source code size. Simulation finished.\n");
       stop = 1;
     }
-    
   }
 
   putchar('\n');
@@ -183,7 +194,6 @@ int main(int argc,char *argv[])
     print_pc();
     putchar('\n');
   }
-
 
   //統計情報を表示
   if(print_stat) {

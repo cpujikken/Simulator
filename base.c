@@ -15,6 +15,7 @@ unsigned int link_sp = 0;
 
 
 //for debug
+unsigned int codesize;
 int stop = 0;//コードの実行を中止/終了
 int used[NUM_OF_OP];//各命令実行回数
 int dyna = 0;//動的実行命令数
