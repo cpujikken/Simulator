@@ -401,15 +401,15 @@ int execute(unsigned int op) {
     break;
   case OP_CMP:
     if(reg[ra] >= reg[rb]) {
-      flag[ZF] = 1;
+      flag[ZF] = 0;//reset zero flag
       if(print_debug)
 	{
-	  printf(" %d >= %d => set ZF\n",reg[ra],reg[rb]);
+	  printf(" %d >= %d => reset ZF\n",reg[ra],reg[rb]);
 	}
     } else {
-      flag[ZF] = 0;
+      flag[ZF] = 1;//set zero flag
       if(print_debug)
-	printf("%d < %d => reset ZF\n",reg[ra],reg[rb]);
+	printf("%d < %d => set ZF\n",reg[ra],reg[rb]);
     }
     break;
   case OP_LINK:
