@@ -305,6 +305,7 @@ int execute(unsigned int op) {
   
   Mydata md;
   int i;
+  double doub;
   //命令使用回数をカウント  
   used[o.opc]++;
   dyna++;
@@ -372,8 +373,13 @@ int execute(unsigned int op) {
     dprintfr(ra);
     break;
   case OP_FDIV:
-    freg[ra] = freg[rb] / freg[rc];
-    dprintfr(ra);
+    if(freg[rc] == 0) {
+      printf("devision by %f\n",freg[rc]);
+      stop = 1;
+      } else {
+      freg[ra] = freg[rb] / freg[rc];
+      dprintfr(ra);
+      }
     break;
   case OP_FCMP:
     if(freg[ra] > freg[rb]) {
@@ -521,15 +527,25 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_RF:
-    printf("input to %%fr%d >",ra);
+    if(1) {
+      printf("input to %%fr%d >",ra);
+    }
     scanf("%f",&freg[ra]);
     dprintfr(ra);
     break;
   case OP_RI:
-    printf("input to %%r%d >",ra);
-    scanf("%d",&reg[ra]);
-    setflag(ra);
-    dprintr(ra);
+    if(1) {
+      printf("input to %%r%d >",ra);
+    }
+    scanf("%lf",&doub);
+    reg[ra] = doub;
+    if(doub - reg[ra] != 0) {
+      printf("error in RI : input was floating-point number(%f)\n",doub);
+      stop = 1;
+    } else {
+      setflag(ra);
+      dprintr(ra);
+    }
     break;
   case OP_PRINT:
     print_to_file(ra);
@@ -547,8 +563,13 @@ int execute(unsigned int op) {
     dprintr(ra);
     break;
   case OP_DIV:
-    reg[ra] = reg[rb] / reg[rc];
-    dprintr(ra);
+    if(reg[rc] == 0) {
+      printf("division by 0\n");
+      stop = 1;
+    } else {
+      reg[ra] = reg[rb] / reg[rc];
+      dprintr(ra);
+    }
     break;
   case OP_SIP:
     /*命令セットにはIP+8とあるが、
