@@ -313,7 +313,7 @@ int execute(unsigned int op) {
 
   //命令を表示 _labelファイルがあるときはラベル名も表示
   print_op(o,l);
-  if(label_info) {
+  if(label_info && print_debug) {
     printf(" \t#%s\n",addr2label(pc-4));
   }
 
@@ -584,7 +584,7 @@ int execute(unsigned int op) {
       memory[reg[REG_SP]-4+i] = md.c[3-i];//stack pointer-4番地にストア
     }
     if(print_debug)
-      printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]);
+      printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]-4);
     break;
   case OP_FIN:
     if(print_debug==0&&print_to_stdin==1) {

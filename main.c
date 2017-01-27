@@ -187,16 +187,12 @@ int main(int argc,char *argv[])
 
   t2 = gettime();
 
-  //最後にレジスタ等を表示
-  if(print_debug) {
+  //最後にレジスタや統計情報等を表示
+  if(print_stat) {
     print_reg();
     print_freg();
     print_pc();
     putchar('\n');
-  }
-
-  //統計情報を表示
-  if(print_stat) {
     print_statistics();
   }
   fclose(fp_out);
