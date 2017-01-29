@@ -313,9 +313,14 @@ int execute(unsigned int op) {
 
   //命令を表示 _labelファイルがあるときはラベル名も表示
   print_op(o,l);
-  if(label_info && print_debug) {
-    printf(" \t#%s\n",addr2label(pc-4));
+  printf(" \t#");
+  if(print_debug) {
+    if(label_info) {
+      printf("%s,",addr2label(pc-4));
+    }
+    printf("IP=%d\n",pc-4);
   }
+  
 
 
   //オペコードによる場合分け

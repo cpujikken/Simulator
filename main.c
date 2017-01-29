@@ -114,7 +114,7 @@ int main(int argc,char *argv[])
   //1行(32bit)ずつ実行
   while(stop == 0) {
     op = read_mem32(pc);
-    if(print_debug) {
+    if(0) {
       printf("IP = %d \t\t| ",pc);
       print_mem(pc);
     }
