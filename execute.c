@@ -313,8 +313,8 @@ int execute(unsigned int op) {
 
   //命令を表示 _labelファイルがあるときはラベル名も表示
   print_op(o,l);
-  printf(" \t#");
   if(print_debug) {
+    printf(" \t#");
     if(label_info) {
       printf("%s,",addr2label(pc-4));
     }
