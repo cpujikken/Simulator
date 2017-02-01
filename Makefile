@@ -2,7 +2,7 @@ PROGRAM = bsim
 CC = gcc
 CFLAGS = 
 rdwrbin = wrbin rdbin
-SOURCES = define.c base.c print.c label.c execute.c main.c
+SOURCES = define.c base.c parse.c print.c label.c execute.c main.c
 
 $(PROGRAM): $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES)

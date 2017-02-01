@@ -1,77 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "define.h"
 #include "base.h"
 #include "print.h"
 #include "label.h"
+#include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
 
-typedef struct {
-  unsigned int opc;
-  unsigned int opr1;
-  unsigned int opr2;
-  unsigned int opr3;
-  short const16; //off16も同じ
-  unsigned int bits5;
-  unsigned int off_addr26;//符号無しで良くなった
-  int off21; //SIGNED!!!
-} Operation;
-
-typedef struct {
-  unsigned int rd;
-  short off16;
-  unsigned int rs;
-  unsigned int ro;
-  unsigned int size4;
-  unsigned int addr21;
-} Ldst;
-
-//メモリから32bitをunsigned int型で読み込む
-//学科pcはリトルエンディアンなので、後ろから読み込む必要がある
-unsigned int read_mem32(unsigned int mem_addr) {
-  Mydata myd;
-  int i;
-  if(mem_addr >= MEM_SIZE-3) {
-    stop = 1;
-    printf("accessing nil memory(%d)\n",mem_addr);
-    return 0;
-  }
-  for (i = 0;i < 4;i++) {
-    myd.c[i] = memory[mem_addr + 3 - i];
-  }
-  return myd.i;
-}
-
-//命令を成分ごとに分解
-Operation parse(unsigned int op) {
-  Operation o;
-  //オペコード=上位6bit register:5bit for each
-  o.opc = op >> 26;
-  o.opr1 = (op >> 21) & 0b11111;
-  o.opr2 = (op >> 16) & 0b11111;
-  o.opr3 = (op >> 11) & 0b11111;
-  o.const16 = (short)(op & 0xffff);
-  o.bits5 = (op >> 13) & 0b11111;
-  o.off_addr26 = op & 0x3ffffff;//lower 26bit
-  unsigned int hojo = op & 0x1fffff;//lower21bit.Whether sign bit is 1 or 0?
-  if(hojo <= 0xfffff) {//<=> if top bit == 0 
-    o.off21 = hojo;
-  } else {
-    o.off21 = (hojo - 0x100000) * -1;
-  }
-  return o;
-}
-
-Ldst parse_ldst(unsigned int op) {
-  Ldst l;
-  l.rd = (op >> 21) & 0b11111;
-  l.off16 = (op >> 5) & 0xffff;
-  l.rs = (op >> 16) & 0b11111;
-  l.ro = (op >> 7) & 0b11111;
-  l.size4 = (op >> 12) & 0b1111;
-  l.addr21 = op & 0x1fffff;
-  return l;
-}
 
 int setflag(int rnum) {
   if(reg[rnum] == 0) {
@@ -83,109 +19,6 @@ int setflag(int rnum) {
     printf(" => r%d = %d\n",rnum,reg[rnum]);
   }
   return 0;
-}
-
-void print_op(Operation o,Ldst l) {
-  if(print_debug == 0) 
-    return;
-  unsigned int ra = o.opr1;
-  unsigned int rb = o.opr2;
-  unsigned int rc = o.opr3;
-
-  //命令名を表示する
-  //printf("operation: ");
-  print_opc(o.opc);
-  putchar('\t');
-
-  //オペコードによる場合分け
-  switch (o.opc) {
-  case OP_NOP:
-  case OP_LINK:
-  case OP_FIN:
-  case OP_JC:
-  case OP_JLINKC:
-  case OP_SIP:
-    break;
-  case OP_ADD:
-  case OP_SUB:
-  case OP_XOR:
-  case OP_SL:
-  case OP_SR:
-  case OP_MUL:
-  case OP_DIV:
-    printf("%%r%d, %%r%d, %%r%d",ra,rb,rc);
-    break;
-  case OP_ADDI:
-  case OP_LDR:
-  case OP_SDR:
-    printf("%%r%d, %%r%d, $%d",ra,rb,o.const16);
-    break;
-  case OP_HALF:
-  case OP_FOUR:
-  case OP_CMP:
-  case OP_MV:
-  case OP_NEG2:
-  case OP_INC1:
-  case OP_DEC1:
-  case OP_CEQ:
-    printf("%%r%d, %%r%d",ra,rb);
-    break;
-  case OP_J:
-  case OP_JZ:
-  case OP_FJLT:
-  case OP_FJEQ:
-  case OP_JLINK:
-    printf("$%d",o.off_addr26);
-    break;
-  case OP_FADD:
-  case OP_FSUB:
-  case OP_FMUL:
-  case OP_FDIV:
-    printf("%%fr%d, %%fr%d, %%fr%d",ra,rb,rc);
-    break;
-  case OP_FCMP:
-  case OP_FNEG2:
-  case OP_FMV:
-  case OP_FABS:
-    printf("%%fr%d, %%fr%d",ra,rb);
-    break;
-  case OP_NEG1:
-  case OP_INC:
-  case OP_DEC:
-  case OP_RI:
-  case OP_PRINT:
-    printf("%%r%d",ra);
-    break;
-  case OP_FNEG1:
-  case OP_RF:
-    printf("%%fr%d",ra);
-    break;
-  case OP_MVI:
-    printf("%%r%d, $%d",ra,o.off21);
-    break;
-  case OP_LDD:
-  case OP_SDD:
-    printf("%%r%d, %%r%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
-    break;
-  case OP_LDA:
-  case OP_SDA:
-    printf("%%r%d, $%d",l.rd,l.addr21);
-    break;
-  case OP_FLDR:
-  case OP_FSDR:
-    printf("%%fr%d, %%r%d, $%d",ra,rb,o.const16);
-    break;
-  case OP_FLDD:
-  case OP_FSDD:
-    printf("%%fr%d, %%fr%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
-    break;
-  case OP_FLDA:
-  case OP_FSDA:
-    printf("%%fr%d, $%d",l.rd,l.addr21);
-    break;
-  }
-  
-  //putchar('\n');
 }
 
 
@@ -286,8 +119,13 @@ void jump(unsigned int j) {
     return;
   }
   pc = j;
-  if(print_debug)
-    printf(" => JUMPED TO %d\n",j);
+  if(mode_jump) {
+    mode_jump = 0;
+    mode_step = 1;
+  }
+  if(print_debug) {
+    printf(" => JUMPED TO %d(%s)\n",j,addr2label(j));
+  }
 }
 //ジャンプ非成立時の表示
 void nojump() {
@@ -295,33 +133,28 @@ void nojump() {
     printf(" => NO JUMP\n");
 }
 
+//浮動小数点演算実行後、値がinfになったら止まる
+//いっそ止まらずにそのままスタックオーバフローしてくれたほうがバグを見つけやすいかも
+void stop_ifinf(int rnum) {
+  if(isinf(freg[rnum])) {
+    stop = 1;
+    printf("%%fr%d is infinity\n",rnum);
+  }  
+}
+
 //コード一行を実行
-int execute(unsigned int op) {
+int execute(unsigned int op ,Operation o, Ldst l) {
   int status;
-  Operation o = parse(op);
   unsigned int ra = o.opr1;
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
-  Ldst l = parse_ldst(op);
-  
   Mydata md;
   int i;
   double doub;
-  //命令使用回数をカウント  
+
+  //命令使用回数をカウント
   used[o.opc]++;
   dyna++;
-
-  //命令を表示 _labelファイルがあるときはラベル名も表示
-  print_op(o,l);
-  if(print_debug) {
-    printf(" \t#");
-    if(label_info) {
-      printf("%s,",addr2label(pc-4));
-    }
-    printf("IP=%d\n",pc-4);
-  }
-  
-
 
   //オペコードによる場合分け
   switch (o.opc) {
@@ -373,14 +206,17 @@ int execute(unsigned int op) {
   case OP_FADD:
     freg[ra] = freg[rb] + freg[rc];
     dprintfr(ra);
+    stop_ifinf(ra);
     break;
   case OP_FSUB:
     freg[ra] = freg[rb] - freg[rc];
     dprintfr(ra);
+    stop_ifinf(ra);
     break;
   case OP_FMUL:
     freg[ra] = freg[rb] * freg[rc];
     dprintfr(ra);
+    stop_ifinf(ra);
     break;
   case OP_FDIV:
     if(freg[rc] == 0) {
@@ -389,6 +225,7 @@ int execute(unsigned int op) {
       } else {
       freg[ra] = freg[rb] / freg[rc];
       dprintfr(ra);
+      stop_ifinf(ra);
       }
     break;
   case OP_FCMP:
@@ -433,14 +270,17 @@ int execute(unsigned int op) {
     if(i < 0) {
       printf("accessing nil memory(%d) : at IP = %d\n",i,pc);
     }
-    i = read_mem32(reg[REG_SP]-4);//stack pointer-4番地をロード
+    i = read_mem32(i);//stack pointer-4番地をロード
     if(print_debug)
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
     reg[REG_SP] = reg[REG_SP] - 4;//pop
     jump(i);
     break;
   case OP_JC:
-    jump(read_mem32(reg[REG_CL]));
+    i = read_mem32(reg[REG_CL]);//stack pointer-4番地をロード
+    if(print_debug)
+      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
+    jump(i);
     break;
   case OP_MV:
     reg[ra]=reg[rb];
@@ -620,8 +460,17 @@ int execute(unsigned int op) {
   }
 
   //動的命令数が指定回数以上になったらデバッグ情報を表示し始める
-  if(start_print > 0 && print_debug == 0 && dyna >= start_print) {
+  if(start_print > 0 && dyna >= start_print) {
+    start_print = 0;
     print_debug = 1;
+    mode_step = start_with_step;
   }
+
+  //動的命令数が指定回数以上になったらシミュレーションを終える
+  if(end_point > 0 && dyna >= end_point) {
+    printf("arrived at end point\n");
+    stop = 1;
+  }
+
   return 0;
 }

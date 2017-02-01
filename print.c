@@ -2,7 +2,9 @@
 #include <string.h>
 #include "define.h"
 #include "base.h"
+#include "parse.h"
 #include "print.h"
+
 
 //読み込んだ命令(32bit)を16進数表示 リトルエンディアン用
 //だったのですが、バイナリで表示することにしました。そのほうが見やすいし。
@@ -93,12 +95,12 @@ void print_to_file(unsigned int rnum) {
 //デバッグ情報表示モードのときのみ
 void dprintr(unsigned int rnum) {
   if(print_debug)
-    printf(" => r%d = %d\n",rnum,reg[rnum]);
+    printf(" => %%r%d = %d\n",rnum,reg[rnum]);
   return;
 }
 void dprintfr(unsigned int rnum){
   if(print_debug)
-    printf(" => fr%d = %f\n",rnum,freg[rnum]);
+    printf(" => %%fr%d = %f\n",rnum,freg[rnum]);
   return;
 }
 
@@ -345,4 +347,107 @@ void print_opc(unsigned int opcode) {
   }
   printf("%s",o);
   return;
+}
+
+void print_op(Operation o,Ldst l) {
+  if(print_debug == 0) 
+    return;
+  unsigned int ra = o.opr1;
+  unsigned int rb = o.opr2;
+  unsigned int rc = o.opr3;
+
+  //命令名を表示する
+  //printf("operation: ");
+  print_opc(o.opc);
+  putchar('\t');
+
+  //オペコードによる場合分け
+  switch (o.opc) {
+  case OP_NOP:
+  case OP_LINK:
+  case OP_FIN:
+  case OP_JC:
+  case OP_JLINKC:
+  case OP_SIP:
+    break;
+  case OP_ADD:
+  case OP_SUB:
+  case OP_XOR:
+  case OP_SL:
+  case OP_SR:
+  case OP_MUL:
+  case OP_DIV:
+    printf("%%r%d, %%r%d, %%r%d",ra,rb,rc);
+    break;
+  case OP_ADDI:
+  case OP_LDR:
+  case OP_SDR:
+    printf("%%r%d, %%r%d, $%d",ra,rb,o.const16);
+    break;
+  case OP_HALF:
+  case OP_FOUR:
+  case OP_CMP:
+  case OP_MV:
+  case OP_NEG2:
+  case OP_INC1:
+  case OP_DEC1:
+  case OP_CEQ:
+    printf("%%r%d, %%r%d",ra,rb);
+    break;
+  case OP_J:
+  case OP_JZ:
+  case OP_FJLT:
+  case OP_FJEQ:
+  case OP_JLINK:
+    printf("$%d",o.off_addr26);
+    break;
+  case OP_FADD:
+  case OP_FSUB:
+  case OP_FMUL:
+  case OP_FDIV:
+    printf("%%fr%d, %%fr%d, %%fr%d",ra,rb,rc);
+    break;
+  case OP_FCMP:
+  case OP_FNEG2:
+  case OP_FMV:
+  case OP_FABS:
+    printf("%%fr%d, %%fr%d",ra,rb);
+    break;
+  case OP_NEG1:
+  case OP_INC:
+  case OP_DEC:
+  case OP_RI:
+  case OP_PRINT:
+    printf("%%r%d",ra);
+    break;
+  case OP_FNEG1:
+  case OP_RF:
+    printf("%%fr%d",ra);
+    break;
+  case OP_MVI:
+    printf("%%r%d, $%d",ra,o.off21);
+    break;
+  case OP_LDD:
+  case OP_SDD:
+    printf("%%r%d, %%r%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
+    break;
+  case OP_LDA:
+  case OP_SDA:
+    printf("%%r%d, $%d",l.rd,l.addr21);
+    break;
+  case OP_FLDR:
+  case OP_FSDR:
+    printf("%%fr%d, %%r%d, $%d",ra,rb,o.const16);
+    break;
+  case OP_FLDD:
+  case OP_FSDD:
+    printf("%%fr%d, %%fr%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
+    break;
+  case OP_FLDA:
+  case OP_FSDA:
+    printf("%%fr%d, $%d",l.rd,l.addr21);
+    break;
+  }
+  
+  //putchar('\n');
 }

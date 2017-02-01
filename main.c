@@ -14,16 +14,17 @@ double gettime() {
   return ((double)(tv.tv_sec) + (double)(tv.tv_usec) * 0.001 * 0.001);
 }
 
-
 int main(int argc,char *argv[])
 {
   char s[20];
   unsigned int i;
   int line = 0;
   unsigned int op;
+  Operation o;
+  Ldst l;
+  double t1,t2;//実行時間測定用
   int num;//ステップ実行用
   int read;//ステップ実行用
-  double t1,t2;//実行時間測定用
 
   t1 = gettime();
 
@@ -36,14 +37,36 @@ int main(int argc,char *argv[])
 	filename = argv[2];
 	if(argc > 3) {
 	  start_print = atoi(argv[3]);
-	  if(start_print==0) print_debug = 1;
+	  printf("start from din=%d\n",start_print);
+	  if(start_print == 0) {
+	    print_debug = 1;
+	    mode_step = 1;
+	  } else {
+	  start_with_step = 1;
+	  mode_step = 0;
+	  print_debug = 0;
+	  }
+	  if(argc > 4) end_point = atoi(argv[4]);
 	}
       }
     } else {
       filename = argv[1];
 	if(argc > 2) {
 	  start_print = atoi(argv[2]);
-	  if(start_print==0) print_debug = 1;
+	  printf("start from din=%d\n",start_print);
+	  start_with_step = mode_step;
+	  mode_step = 0;
+	  if(start_print==0) {
+	    print_debug = 1;
+	    mode_step = 1;
+	  } else {
+	    start_with_step = 1;//mode_step;
+	    mode_step = 0;
+	    print_debug = 0;
+	  }
+	  if(argc > 3) {
+	    end_point = atoi(argv[3]);
+	  }
 	}
 
     }
@@ -113,11 +136,42 @@ int main(int argc,char *argv[])
   }
   //1行(32bit)ずつ実行
   while(stop == 0) {
+    //skipモードなら次の番地まで飛ばす
+    if(mode_sipnext > 0 && mode_step==1) {
+      mode_step = 0;
+      print_debug = 0;
+      printf("skip until IP=%d...\n",mode_sipnext);
+    }
+    //skipモードからの復帰
+    if(mode_sipnext == pc) {
+      mode_sipnext = 0;
+      mode_step = 1;
+      print_debug = 1;
+    }
+
+
+    //命令解読
     op = read_mem32(pc);
+    o =  parse(op);
+    l = parse_ldst(op);
+
+  //命令を表示 _labelファイルがあるときはラベル名も表示
+    print_op(o,l);
+    if(print_debug) {
+      printf(" \t#");
+      if(label_info) {
+	printf("%s,",addr2label(pc));
+      }
+      printf("IP=%d,din=%d\n",pc,dyna);
+    }
+    /*
+    //binary表示
     if(0) {
       printf("IP = %d \t\t| ",pc);
       print_mem(pc);
     }
+    */
+
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
       read = 1;
@@ -125,14 +179,29 @@ int main(int argc,char *argv[])
 	scanf("%s",s);
 	if(strcmp(s,"n") == 0) {
 	  read = 0;
+	} else if(strcmp(s,"s") == 0) {
+	  read = 0;
+	  //前の命令がSIPである必要がある
+	  i = read_mem32(pc-4);
+	  i = i >> 26;//i=前の命令のオペコード
+	  if(i == OP_SIP) {
+	    mode_sipnext = pc + 4;
+	  }
+	} else if(strcmp(s,"j") == 0) {
+	  read = 0;
+	  mode_step = 0;
+	  mode_jump = 1;
 	} else if(strcmp(s,"q") == 0 || strcmp(s,"quit") == 0) {
-	  return 0;
+	  read=0;
+	  stop=1;
 	} else if(strcmp(s,"pr") == 0) {
 	  print_reg();
 	} else if(strcmp(s,"pfr") == 0) {
 	  print_freg();
 	} else if(strcmp(s,"pip") == 0) {
 	  print_pc();
+	} else if(strcmp(s,"pdin") == 0) {
+	  printf("%d\n",dyna);
 	} else if(strcmp(s,"pm_int") == 0) {
 	  Mydata my;
 	  scanf("%d",&num);
@@ -174,7 +243,9 @@ int main(int argc,char *argv[])
       }
     }
     pc += 4;//命令を読んだ瞬間(just before executing it)に+される
-    execute(op);//命令実行
+
+    if(stop==0)
+      execute(op,o,l);//命令実行
 
     //pcがソースコードの長さ以上になったら
     if(pc > codesize) {
