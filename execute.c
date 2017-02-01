@@ -267,12 +267,12 @@ int fstore(unsigned int rnum,unsigned int addr) {
 
   Mydata md;
   int i;
-  md.f = reg[rnum];
+  md.f = freg[rnum];
   for(i=0;i<4;i++) {
     memory[addr+i] = md.c[3-i];//リトルエンディアン
   }
   if(print_debug)
-    printf(" => STORED %d TO MEMORY[%d]\n",md.i,addr);
+    printf(" => STORED %f TO MEMORY[%d]\n",md.f,addr);
   return 0;
 }
 

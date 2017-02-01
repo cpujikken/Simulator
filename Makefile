@@ -17,3 +17,6 @@ clean:
 	find -name "*_out" | xargs $(RM)
 clean_bin:
 	$(RM) $(rdwrbin)
+move_test:
+	mv ../assembler/example ./
+	mv ../assembler/example_label ./ 
