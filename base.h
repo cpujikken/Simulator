@@ -9,7 +9,7 @@
 #define REG_LR 32//使わない
 #define REG_SP 31//旧30
 #define REG_HP 30
-#define REG_CL 0//旧28 //register for closure
+#define REG_CL 29//旧28 //register for closure
 #define ZF 6 //zero flag 今の汎用レジスタフラグはZFのみなので実際にはフラグは1bit
 #define FEQ 0 //eq flag
 #define FGT 1
