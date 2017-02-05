@@ -32,3 +32,4 @@ char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;
 FILE *fp;
 FILE *fp_out;
+FILE *fp_sld = NULL;

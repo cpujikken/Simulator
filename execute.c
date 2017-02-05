@@ -8,7 +8,6 @@
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
 
-
 int setflag(int rnum) {
   if(reg[rnum] == 0) {
     flag[ZF] = 1;
@@ -133,8 +132,8 @@ void nojump() {
     printf(" => NO JUMP\n");
 }
 
+
 //浮動小数点演算実行後、値がinfになったら止まる
-//いっそ止まらずにそのままスタックオーバフローしてくれたほうがバグを見つけやすいかも
 void stop_ifinf(int rnum) {
   if(isinf(freg[rnum])) {
     stop = 1;
@@ -384,7 +383,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintfr(ra);
     break;
   case OP_RI:
-    if(1) {
+    if(print_debug) {
       printf("input to %%r%d >",ra);
     }
     scanf("%lf",&doub);
@@ -452,7 +451,25 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	printf("%d != %d => reset ZF\n",reg[ra],reg[rb]);
     }
     break;
-    
+  case OP_RC:
+    //sldファイルから文字列をバイナリとして4byte読み取る
+    if(fp_sld == NULL) {
+      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
+	printf("sld file not found\n");
+      }
+    }
+    /*
+      4byte読んでレジスタに入れる
+      このシミュレータでは、
+      レジスタ上のデータはリトルエンディアンとして演算を行っているので
+      レジスタに入れるときにバイトオーダを変えたりせずにそのまま4byte載せてます
+     */
+    fread(&reg[ra],sizeof(int),1,fp_sld);
+    if(print_debug) {
+      printf(" => %%r%d = ",ra);
+      print_bin_little(reg[ra]);
+    }
+    break;
     
   default:
     printf("undefined operation\n");

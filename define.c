@@ -21,3 +21,6 @@ int print_little = 1;
 //レジスタやメモリの初期値をランダムにします。
 //初期値が0でなくても正しく実行されるかのテストに使用。
 int init_randomize = 0;
+
+//入力sldファイルの名称
+char name_sld[20] = "contest.sld";

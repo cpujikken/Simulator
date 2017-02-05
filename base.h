@@ -28,6 +28,7 @@ extern char default_file[];
 extern char *filename;
 extern FILE *fp;
 extern FILE *fp_out;
+extern FILE *fp_sld;
 extern unsigned int op;
 extern unsigned int link_stack[];
 extern unsigned int link_sp;
@@ -111,5 +112,6 @@ typedef union {
 #define OP_SIP	        53
 #define OP_FIN		54
 #define OP_CEQ          55
+#define OP_RC		56
 
 #endif

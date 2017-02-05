@@ -41,7 +41,7 @@ void print_bin_little(unsigned int x){
     print_bin_byte(myd.c[i]);
     putchar(' ');
   }
-  putchar('\n');
+  printf("(printing in big endian)\n");
 }
 
 //メモリの内容を直接みたいとき
@@ -69,7 +69,7 @@ void print_to_file(unsigned int rnum) {
     }
     return;
   }
-
+  
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
   if(print_little) {
@@ -174,7 +174,7 @@ void print_pointer(void *p){
 
 //命令名を表示
 void print_opc(unsigned int opcode) {
-  char o[10];
+  char o[25];
   switch (opcode) {
   case OP_NOP:
     strcpy(o,"NOP");
@@ -341,8 +341,12 @@ void print_opc(unsigned int opcode) {
   case OP_CEQ:
     strcpy(o,"CEQ");
     break;
+  case OP_RC:
+    strcpy(o,"RC");
+    break;
   default:
-    strcpy(o,"???");
+    printf("%d",opcode);
+    strcpy(o,"(unknown opcode)");
     break;
   }
   printf("%s",o);
@@ -418,6 +422,7 @@ void print_op(Operation o,Ldst l) {
   case OP_DEC:
   case OP_RI:
   case OP_PRINT:
+  case OP_RC:
     printf("%%r%d",ra);
     break;
   case OP_FNEG1:
