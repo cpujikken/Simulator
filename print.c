@@ -174,6 +174,7 @@ void print_pointer(void *p){
 
 //命令名を表示
 void print_opc(unsigned int opcode) {
+  
   char o[25];
   switch (opcode) {
   case OP_NOP:
@@ -354,17 +355,22 @@ void print_opc(unsigned int opcode) {
 }
 
 void print_op(Operation o,Ldst l) {
+  
   if(print_debug == 0) 
     return;
+  
+  
   unsigned int ra = o.opr1;
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
-
+  
   //命令名を表示する
   //printf("operation: ");
+  
   print_opc(o.opc);
+  
   putchar('\t');
-
+  
   //オペコードによる場合分け
   switch (o.opc) {
   case OP_NOP:
@@ -453,5 +459,6 @@ void print_op(Operation o,Ldst l) {
     printf("%%fr%d, $%d",l.rd,l.addr21);
     break;
   }
+  
   return;
 }

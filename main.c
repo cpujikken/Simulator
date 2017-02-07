@@ -71,6 +71,10 @@ int main(int argc,char *argv[])
 
     }
   }
+  //debug情報非表示でstep実行は止まってるのと見分けがつかない
+  if(print_debug == 0 && mode_step == 1) {
+    mode_step = 0;
+  }
     
   //バイナリモードでファイルオープン
   if((fp = fopen(filename,"rb")) == NULL) {
@@ -257,6 +261,10 @@ int main(int argc,char *argv[])
   putchar('\n');
 
   t2 = gettime();
+
+  if(fp_sld != NULL) {
+    fclose(fp_sld);
+  }
 
   //最後にレジスタや統計情報等を表示
   if(print_stat) {

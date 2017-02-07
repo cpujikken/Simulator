@@ -383,8 +383,11 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     if(fp_sld != NULL) {
-      fscanf(fp_sld,"%f",&freg[ra]);
-      dprintfr(ra);
+      if(fscanf(fp_sld,"%f",&freg[ra]) == EOF) {
+	printf("read EOF from %s\n",name_sld);
+      } else {
+	dprintfr(ra);
+      }
     }
     break;
   case OP_RI:
@@ -398,14 +401,18 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     if(fp_sld != NULL) {
-      fscanf(fp_sld,"%lf",&doub);
-      reg[ra] = doub;
-      if(doub - reg[ra] != 0) {
-	printf("error in RI : input was floating-point number(%f)\n",doub);
+      if(fscanf(fp_sld,"%lf",&doub) == EOF) {
+	printf("read EOF from %s\n",name_sld);
 	stop = 1;
       } else {
-	setflag(ra);
-	dprintr(ra);
+	reg[ra] = doub;
+	if(doub - reg[ra] != 0) {
+	  printf("error in RI : input was floating-point number(%f)\n",doub);
+	  stop = 1;
+	} else {
+	  setflag(ra);
+	  dprintr(ra);
+	}
       }
     }
     break;
@@ -481,19 +488,31 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       (あやしい)
      */
     if(fp_sld != NULL) {
-      fread(&(md2.i),sizeof(int),1,fp_sld);
-      for(i=0;i<4;i++) {
-	md.c[3-i] = md2.c[i];
-      }
-      reg[ra] = md.i;
-      if(print_debug) {
-	printf(" => %%r%d = ",ra);
-	putchar(md.c[3]);
-	putchar(md.c[2]);
-	putchar(md.c[1]);
-	putchar(md.c[0]);
-	printf(" | ");
-	print_bin_little(reg[ra]);
+      //putchar('\t');
+      if((i=fread(&(md2.i),sizeof(int),1,fp_sld)) <= 0) {
+	/*
+	printf("failed to read from %s\n",name_sld);
+	stop = 1;
+	*/
+	reg[ra] = 255;
+	if(print_debug) {
+	  printf("%%r%d = 255(EOF)\n",ra);
+	}
+      } else {
+	for(i=0;i<4;i++) {
+	  md.c[3-i] = md2.c[i];
+	}
+	reg[ra] = md.i;
+	
+	if(print_debug) {
+	  printf(" => %%r%d = ",ra);
+	  putchar(md.c[3]);
+	  putchar(md.c[2]);
+	  putchar(md.c[1]);
+	  putchar(md.c[0]);
+	  printf(" | ");
+	  print_bin_little(reg[ra]);
+	}
       }
     }
     break;
