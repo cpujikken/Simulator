@@ -488,6 +488,12 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	}
       } else {
 	reg[ra] = md.i;
+	if(md.c[0] == EOF) {
+	  reg[ra] = 255;
+	  if(print_debug) {
+	    printf("%%r%d = 255(EOF)\n",ra);
+	  }
+	}
 	
 	if(print_debug) {
 	  printf(" => %%r%d = ",ra);
