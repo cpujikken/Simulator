@@ -41,7 +41,7 @@ void print_bin_little(unsigned int x){
     print_bin_byte(myd.c[i]);
     putchar(' ');
   }
-  printf("(printing in big endian)\n");
+  printf("(big endian)\n");
 }
 
 //メモリの内容を直接みたいとき

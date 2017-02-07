@@ -18,7 +18,7 @@ unsigned int link_sp = 0;
 unsigned int codesize;
 int stop = 0;//コードの実行を中止/終了
 int mode_jump = 0;//次の命令までジャンプするモード
-int mode_sipnext = 0;//次の番地の命令まで続けて実行するモード。SIP時に使う
+int mode_sipnext = -1;//次の番地の命令まで続けて実行するモード。SIP時に使う
 int used[NUM_OF_OP];//各命令実行回数
 int dyna = 0;//動的実行命令数
 int branch[NUM_OF_OP];

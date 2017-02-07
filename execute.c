@@ -147,7 +147,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   unsigned int ra = o.opr1;
   unsigned int rb = o.opr2;
   unsigned int rc = o.opr3;
-  Mydata md;
+  Mydata md,md2;
   int i;
   double doub;
 
@@ -376,9 +376,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_RF:
-    if(print_debug) {
-      printf("input to %%fr%d >",ra);
-    }
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
 	printf("%s not found\n",name_sld);
@@ -387,11 +384,8 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(fp_sld != NULL) {
       fscanf(fp_sld,"%f",&freg[ra]);
-      dprintr(ra);
+      dprintfr(ra);
     }
-    break;
-    scanf("%f",&freg[ra]);
-    dprintfr(ra);
     break;
   case OP_RI:
     if(print_debug) {
@@ -482,12 +476,23 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       4byte読んでレジスタに入れる
       このシミュレータでは、
       レジスタ上のデータはリトルエンディアンとして演算を行っているので
-      レジスタに入れるときにバイトオーダを変えたりせずにそのまま4byte載せてます
+      (コアではビッグエンディアンで行っている？)
+      レジスタに入れるときにbyteごとの順番をひっくり返して載せてます
+      (あやしい)
      */
     if(fp_sld != NULL) {
-      fread(&reg[ra],sizeof(int),1,fp_sld);
+      fread(&(md2.i),sizeof(int),1,fp_sld);
+      for(i=0;i<4;i++) {
+	md.c[3-i] = md2.c[i];
+      }
+      reg[ra] = md.i;
       if(print_debug) {
 	printf(" => %%r%d = ",ra);
+	putchar(md.c[3]);
+	putchar(md.c[2]);
+	putchar(md.c[1]);
+	putchar(md.c[0]);
+	printf(" | ");
 	print_bin_little(reg[ra]);
       }
     }
