@@ -164,13 +164,13 @@ int main(int argc,char *argv[])
       }
       printf("IP=%d,din=%d\n",pc,dyna);
     }
-    /*
+    
     //binary表示
-    if(0) {
-      printf("IP = %d \t\t| ",pc);
+    if(print_op_bin) {
+      printf("IP = %d \t| ",pc);
       print_mem(pc);
     }
-    */
+    
 
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {

@@ -453,6 +453,5 @@ void print_op(Operation o,Ldst l) {
     printf("%%fr%d, $%d",l.rd,l.addr21);
     break;
   }
-  
-  //putchar('\n');
+  return;
 }

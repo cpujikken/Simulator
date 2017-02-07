@@ -6,6 +6,8 @@
 
 //実行中の命令名など、デバッグ用の情報を表示する
 int print_debug = 0;
+//命令をバイナリでも表示(主にアセンブラデバッグ用)
+int print_op_bin = 0;
 
 //PRINT命令の結果を(_outファイルでなく)標準出力に出力(print_debug=0の時のみ有効)
 int print_to_stdin = 0;
@@ -15,7 +17,7 @@ int print_raw = 1;
 //実行後、各命令実行回数などの統計情報を表示する
 int print_stat = 1;
 //ステップ実行する
-int mode_step = 0;
+int mode_step = 1;
 //PRINTでの出力のバイトオーダをリトルエンディアンにする
 int print_little = 1;
 //レジスタやメモリの初期値をランダムにします。
@@ -24,3 +26,4 @@ int init_randomize = 0;
 
 //入力sldファイルの名称
 char name_sld[20] = "contest.sld";
+
