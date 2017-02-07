@@ -472,46 +472,29 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     break;
   case OP_RC:
-    //sldファイルから文字列をバイナリとして4byte読み取る
+    //sldファイルから文字列をバイナリとして1byte読み取る
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
 	printf("%s not found\n",name_sld);
 	stop = 1;
       }
     }
-    /*
-      4byte読んでレジスタに入れる
-      このシミュレータでは、
-      レジスタ上のデータはリトルエンディアンとして演算を行っているので
-      (コアではビッグエンディアンで行っている？)
-      レジスタに入れるときにbyteごとの順番をひっくり返して載せてます
-      (あやしい)
-     */
     if(fp_sld != NULL) {
       //putchar('\t');
-      if((i=fread(&(md2.i),sizeof(int),1,fp_sld)) <= 0) {
-	/*
-	printf("failed to read from %s\n",name_sld);
-	stop = 1;
-	*/
+      if((i=fread(&(md.c[0]),sizeof(char),1,fp_sld)) <= 0) {
 	reg[ra] = 255;
 	if(print_debug) {
 	  printf("%%r%d = 255(EOF)\n",ra);
 	}
       } else {
-	for(i=0;i<4;i++) {
-	  md.c[3-i] = md2.c[i];
-	}
 	reg[ra] = md.i;
 	
 	if(print_debug) {
 	  printf(" => %%r%d = ",ra);
-	  putchar(md.c[3]);
-	  putchar(md.c[2]);
-	  putchar(md.c[1]);
 	  putchar(md.c[0]);
 	  printf(" | ");
-	  print_bin_little(reg[ra]);
+	  print_bin_byte(md.c[0]);
+	  putchar('\n');
 	}
       }
     }
