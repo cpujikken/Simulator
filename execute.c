@@ -472,6 +472,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     break;
   case OP_RC:
+    md.i=0;//mdを初期化
     //sldファイルから文字列をバイナリとして1byte読み取る
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
@@ -480,7 +481,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     if(fp_sld != NULL) {
-      //putchar('\t');
       if((i=fread(&(md.c[0]),sizeof(char),1,fp_sld)) <= 0) {
 	reg[ra] = 255;
 	if(print_debug) {
