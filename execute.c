@@ -376,9 +376,20 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_RF:
-    if(1) {
+    if(print_debug) {
       printf("input to %%fr%d >",ra);
     }
+    if(fp_sld == NULL) {
+      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
+	printf("%s not found\n",name_sld);
+	stop = 1;
+      }
+    }
+    if(fp_sld != NULL) {
+      fscanf(fp_sld,"%f",&freg[ra]);
+      dprintr(ra);
+    }
+    break;
     scanf("%f",&freg[ra]);
     dprintfr(ra);
     break;
@@ -386,14 +397,22 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     if(print_debug) {
       printf("input to %%r%d >",ra);
     }
-    scanf("%lf",&doub);
-    reg[ra] = doub;
-    if(doub - reg[ra] != 0) {
-      printf("error in RI : input was floating-point number(%f)\n",doub);
-      stop = 1;
-    } else {
-      setflag(ra);
-      dprintr(ra);
+    if(fp_sld == NULL) {
+      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
+	printf("%s not found\n",name_sld);
+	stop = 1;
+      }
+    }
+    if(fp_sld != NULL) {
+      fscanf(fp_sld,"%lf",&doub);
+      reg[ra] = doub;
+      if(doub - reg[ra] != 0) {
+	printf("error in RI : input was floating-point number(%f)\n",doub);
+	stop = 1;
+      } else {
+	setflag(ra);
+	dprintr(ra);
+      }
     }
     break;
   case OP_PRINT:
@@ -455,7 +474,8 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     //sldファイルから文字列をバイナリとして4byte読み取る
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
-	printf("sld file not found\n");
+	printf("%s not found\n",name_sld);
+	stop = 1;
       }
     }
     /*
@@ -464,10 +484,12 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       レジスタ上のデータはリトルエンディアンとして演算を行っているので
       レジスタに入れるときにバイトオーダを変えたりせずにそのまま4byte載せてます
      */
-    fread(&reg[ra],sizeof(int),1,fp_sld);
-    if(print_debug) {
-      printf(" => %%r%d = ",ra);
-      print_bin_little(reg[ra]);
+    if(fp_sld != NULL) {
+      fread(&reg[ra],sizeof(int),1,fp_sld);
+      if(print_debug) {
+	printf(" => %%r%d = ",ra);
+	print_bin_little(reg[ra]);
+      }
     }
     break;
     
