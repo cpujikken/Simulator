@@ -33,3 +33,5 @@ char *filename = default_file;
 FILE *fp;
 FILE *fp_out;
 FILE *fp_sld = NULL;
+FILE *fp_com = NULL;
+char memory_com[COMMENT_CODESIZE_MAX][COMMENT_LENGTH];

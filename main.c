@@ -78,9 +78,15 @@ int main(int argc,char *argv[])
     
   //バイナリモードでファイルオープン
   if((fp = fopen(filename,"rb")) == NULL) {
-    printf("file open error\n");
+    printf("binary file open error\n");
     return -1;
   }
+
+  //コメント付きのファイルをオープン
+  if(print_debug == 1 && (fp_com = fopen("comment.s","r")) == NULL) {
+    printf("comment.s does not exist\n");
+  }
+
   //HW用、レジスタやメモリの初期値をランダム化
   //初期値が0埋めされてなくても実行できるかのテスト
   if(init_randomize) {
@@ -101,8 +107,14 @@ int main(int argc,char *argv[])
   //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
   }
+  
   fclose(fp);
   codesize = i;//何番地めまで読み込んだのか
+  if(fp_com != NULL) {
+    for(i=0;i<codesize/4;i++) {
+      fgets(memory_com[i],COMMENT_LENGTH,fp_com);
+    }
+  }
   if(print_stat) {
     //メモリ使用領域を記録
     for(i=0;i<codesize/4;i++) {
@@ -138,6 +150,7 @@ int main(int argc,char *argv[])
     print_mem(0);
     printf(" => initial IP = %d\n",pc);
   }
+
   //1行(32bit)ずつ実行
   while(stop == 0) {
     //skipモードなら次の番地まで飛ばす
@@ -166,16 +179,23 @@ int main(int argc,char *argv[])
       if(label_info) {
 	printf("%s,",addr2label(pc));
       }
-      printf("IP=%d,din=%d\n",pc,dyna);
+      printf("IP=%d,din=%d",pc,dyna);
     }
     
+    //comment.sについていたコメントを表示
+    if(print_debug) {
+      if(fp_com != NULL && pc < 4*COMMENT_CODESIZE_MAX) {
+	printf(" #%s",memory_com[pc/4-1]);//基本はpc/4、initial_ip分-1した
+      } else {
+	putchar('\n');
+      }
+    }
     //binary表示
     if(print_op_bin) {
       printf("IP = %d \t| ",pc);
       print_mem(pc);
     }
     
-
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
       read = 1;

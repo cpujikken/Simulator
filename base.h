@@ -15,6 +15,8 @@
 #define FGT 1
 #define FLT 2
 #define UNDEFINED 3
+#define COMMENT_LENGTH 100 //コメントを読み込む際の、読み込むコメントの１行の長さ
+#define COMMENT_CODESIZE_MAX 10000 //codesizeがこれ以上のときはコメントを読み込めない
 extern int reg[];
 extern float freg[];
 extern char memory[];
@@ -46,6 +48,8 @@ extern unsigned char mem_used[];//メモリのi番地を使用したか
 extern int start_print;//動的命令数>=start_printになったらデバッグ情報表示開始
 extern int start_with_step; 
 extern int end_point;
+extern FILE *fp_com;//コメント読み込み
+extern char memory_com[][COMMENT_LENGTH];//コメント保存
 
 //byte単位読み込みとかで使う共用体
 typedef union {
