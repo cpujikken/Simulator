@@ -73,10 +73,12 @@ void print_to_file(unsigned int rnum) {
   //リトルエンディアン->ビッグエンディアン??
   //とりあえずリトルエンディアンのまま出力
   if(print_little) {
-    fwrite((void *)(reg + rnum),sizeof(int),1,fp_out);
+    Mydata myd;
+    myd.i = reg[rnum];
+    fwrite((void *)(&myd.c),sizeof(char),1,fp_out);
     if(print_debug) {
-      printf(" => print out (in little endian) ");
-      print_bin_little(reg[rnum]);
+      printf(" => print out %s\n",myd.c);
+      //print_bin_little(reg[rnum]);
     }
   } else {
     Mydata myd;

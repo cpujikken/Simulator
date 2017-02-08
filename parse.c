@@ -33,7 +33,7 @@ Operation parse(unsigned int op) {
   if(hojo <= 0xfffff) {//<=> if top bit == 0 
     o.off21 = hojo;
   } else {
-    o.off21 = (hojo - 0x100000) * -1;
+    o.off21 = (0x200000 - hojo) * -1;
   }
   return o;
 }

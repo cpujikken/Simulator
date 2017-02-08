@@ -191,7 +191,7 @@ int main(int argc,char *argv[])
       }
     }
     //binary表示
-    if(print_op_bin) {
+    if(print_op_bin && print_debug) {
       printf("IP = %d \t| ",pc);
       print_mem(pc);
     }
