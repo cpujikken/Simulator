@@ -454,7 +454,7 @@ void print_op(Operation o,Ldst l) {
     break;
   case OP_FLDD:
   case OP_FSDD:
-    printf("%%fr%d, %%fr%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
+    printf("%%fr%d, %%r%d, $%d, %%r%d",l.rd,l.rs,l.size4,l.ro);
     break;
   case OP_FLDA:
   case OP_FSDA:

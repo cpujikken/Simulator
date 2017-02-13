@@ -276,9 +276,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     jump(i);
     break;
   case OP_JC:
-    i = read_mem32(reg[REG_CL]);//stack pointer-4番地をロード
+    i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
     if(print_debug)
-      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
+      printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
     jump(i);
     break;
   case OP_MV:
@@ -325,34 +325,50 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     load(ra,reg[rb]+o.const16);
     break;
   case OP_LDD:
-    load(l.rd,reg[l.rs] + l.ro * l.size4);
+    i = reg[l.rs] * l.size4 + reg[l.ro];
+    if(print_debug) {
+      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+    }
+    load(l.rd,i);
     break;
   case OP_LDA:
     load(l.rd,l.addr21);
     break;
   case OP_SDR:
-    store(ra,reg[rb]+o.const16);
+    store(l.rd,reg[rb]+o.const16);
     break;
   case OP_SDD:
-    store(l.rd,reg[l.rs] + l.ro * l.size4);
+    i = reg[l.rs] * l.size4 + reg[l.ro];
+    if(print_debug) {
+      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+    }
+    store(l.rd,i);
     break;
   case OP_SDA:
     store(l.rd,l.addr21);
     break;
   case OP_FLDR:
-    fload(ra,reg[rb]+o.const16);
+    fload(l.rd,reg[rb]+o.const16);
     break;
   case OP_FLDD:
-    fload(l.rd,reg[l.rs] + l.ro * l.size4);
+    i = reg[l.rs] * l.size4 + reg[l.ro];
+    if(print_debug) {
+      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+    }
+    fload(l.rd,i);
     break;
   case OP_FLDA:
     fload(l.rd,l.addr21);
     break;
   case OP_FSDR:
-    fstore(ra,reg[rb]+o.const16);
+    fstore(l.rd,reg[rb]+o.const16);
     break;
   case OP_FSDD:
-    fstore(l.rd,reg[l.rs] + l.ro * l.size4);
+    i = reg[l.rs] * l.size4 + reg[l.ro];
+    if(print_debug) {
+      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+    }
+    fstore(l.rd,i);
     break;
   case OP_FSDA:
     fstore(l.rd,l.addr21);

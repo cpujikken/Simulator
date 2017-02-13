@@ -5,7 +5,8 @@
  */
 
 //実行中の命令名など、デバッグ用の情報を表示する
-int print_debug = 0;
+int print_debug = 1;
+
 //命令をバイナリでも表示(主にアセンブラデバッグ用)
 int print_op_bin = 0;
 
@@ -17,7 +18,7 @@ int print_raw = 1;
 //実行後、各命令実行回数などの統計情報を表示する
 int print_stat = 1;
 //ステップ実行する
-int mode_step = 1;
+int mode_step = 0;
 //PRINTでの出力のバイトオーダをリトルエンディアンにする
 int print_little = 1;
 //レジスタやメモリの初期値をランダムにします。

@@ -184,7 +184,7 @@ int main(int argc,char *argv[])
     
     //comment.sについていたコメントを表示
     if(print_debug) {
-      if(fp_com != NULL && pc < 4*COMMENT_CODESIZE_MAX) {
+      if(fp_com != NULL && pc < 4*COMMENT_CODESIZE_MAX && pc >= 4) {
 	printf(" #%s",memory_com[pc/4-1]);//基本はpc/4、initial_ip分-1した
       } else {
 	putchar('\n');
