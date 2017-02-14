@@ -59,13 +59,11 @@ int main(int argc,char *argv[])
 	if(argc > 3) {
 	  start_print = atoi(argv[3]);
 	  printf("start from din=%d\n",start_print);
-	  start_with_step = mode_step;
-	  mode_step = 0;
 	  if(start_print==0) {
 	    print_debug = 1;
 	    //mode_step = 1;
 	  } else {
-	    start_with_step = 1;
+	    start_with_step = mode_step;
 	    mode_step = 0;
 	    print_debug = 0;
 	  }
@@ -221,6 +219,13 @@ int main(int argc,char *argv[])
 	  read = 0;
 	  mode_step = 0;
 	  mode_jump = 1;
+	} else if(strcmp(s,"r") == 0) {
+	  read = 0;
+	  print_debug = 0;
+	  mode_step = 0;
+	} else if(strcmp(s,"rp") == 0){
+	  read = 0;
+	  mode_step = 0;
 	} else if(strcmp(s,"q") == 0 || strcmp(s,"quit") == 0) {
 	  read=0;
 	  stop=1;

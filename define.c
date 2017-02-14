@@ -27,4 +27,3 @@ int init_randomize = 0;
 
 //入力sldファイルの名称
 char name_sld[20] = "contest.sld";
-

@@ -274,6 +274,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
     reg[REG_SP] = reg[REG_SP] - 4;//pop
     jump(i);
+    call_stack--;
     break;
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
@@ -465,6 +466,10 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(print_debug)
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]-4);
+    if(used[OP_SIP] > 1024) {
+      printf("function call over 1024 times\n");
+      stop = 1;
+    }
     break;
   case OP_FIN:
     if(print_debug==0&&print_to_stdin==1) {

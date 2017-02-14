@@ -27,6 +27,7 @@ unsigned char mem_used[MEM_SIZE/4];
 int start_print = -1;
 int start_with_step = 0;//ステップ実行でstart_pointを指定した場合、start_pointになるまでこれを1にし、start_pointになったらそこからstep実行をする
 int end_point = -1;
+int call_stack = 0;
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;

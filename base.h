@@ -50,6 +50,7 @@ extern int start_with_step;
 extern int end_point;
 extern FILE *fp_com;//コメント読み込み
 extern char memory_com[][COMMENT_LENGTH];//コメント保存
+extern int call_stack;//どれだけ深く関数呼び出ししているか
 
 //byte単位読み込みとかで使う共用体
 typedef union {
