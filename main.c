@@ -59,10 +59,7 @@ int main(int argc,char *argv[])
 	if(argc > 3) {
 	  start_print = atoi(argv[3]);
 	  printf("start from din=%d\n",start_print);
-	  if(start_print==0) {
-	    print_debug = 1;
-	    //mode_step = 1;
-	  } else {
+	  if(start_print>0) {
 	    start_with_step = mode_step;
 	    mode_step = 0;
 	    print_debug = 0;
