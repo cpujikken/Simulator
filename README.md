@@ -5,13 +5,12 @@
 $ make bsim
 
 使い方:  
-$ ./bsim (filename)  
-ファイル名を書かない場合、exampleというファイルを読み込みます。  
-(違うディレクトリに置いてるファイルだとPRINTの動作が怪しいので、とりあえずは同じディレクトリに置いてください)  
-・PRINTによる出力は(filename)_outに出力されます。  
-・設定を変更するには、define.cを開いて該当する変数の値を書き換え、makeしなおしてください。  
-・入力sldファイル名もdefine.cで設定します。デフォルトではcontest.sldを読みます。  
-・./bsim example 120 のように、ファイル名のあとに数字を入力すると、動的命令数がその数字以上になったらデバッグ情報を表示します。実行したファイルが予期せぬ形で終了した時、終了した命令の近くのみのデバッグ情報が知りたい場合に使えます。  
+$ ./bsim (source code file) (input file) (option:DIN where simulator starts printing)  
+・(source code file)を書かない場合、exampleというファイルを読み込みます。  
+・PRINTによる出力は(source code file)_outに出力されます。  
+・各種設定を変更するには、define.cを開いて該当する変数の値を書き換え、makeしなおしてください。  
+・入力sldファイル名(input file)で指定しますが、はdefine.cで設定することもできます。デフォルトではcontest.sldを読みます。
+・./bsim example contest.sld 120 のように、入力ファイル名のあとに数字を入力すると、動的命令数がその数字以上になったらデバッグ情報を表示します。実行したファイルが予期せぬ形で終了した時、終了した命令の近くのみのデバッグ情報が知りたい場合に使えます。  
 
 ・ステップ実行も可能。define.cの変数mode_step=1にするか、コマンドラインで -s をつけてください。   
 $ ./bsim -s (filename)  

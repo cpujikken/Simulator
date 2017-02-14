@@ -36,23 +36,28 @@ int main(int argc,char *argv[])
       if(argc > 2) {
 	filename = argv[2];
 	if(argc > 3) {
-	  start_print = atoi(argv[3]);
-	  printf("start from din=%d\n",start_print);
-	  if(start_print == 0) {
-	    print_debug = 1;
-	    mode_step = 1;
-	  } else {
-	  start_with_step = 1;
-	  mode_step = 0;
-	  print_debug = 0;
+	  strcpy(name_sld,argv[3]);
+	  if(argc > 4) {
+	    start_print = atoi(argv[4]);
+	    printf("start from din=%d\n",start_print);
+	    if(start_print == 0) {
+	      print_debug = 1;
+	      mode_step = 1;
+	    } else {
+	      start_with_step = 1;
+	      mode_step = 0;
+	      print_debug = 0;
+	    }
+	    if(argc > 5) end_point = atoi(argv[5]);
 	  }
-	  if(argc > 4) end_point = atoi(argv[4]);
 	}
       }
     } else {
       filename = argv[1];
-	if(argc > 2) {
-	  start_print = atoi(argv[2]);
+      if(argc > 2) {
+	strcpy(name_sld,argv[2]);
+	if(argc > 3) {
+	  start_print = atoi(argv[3]);
 	  printf("start from din=%d\n",start_print);
 	  start_with_step = mode_step;
 	  mode_step = 0;
@@ -64,11 +69,12 @@ int main(int argc,char *argv[])
 	    mode_step = 0;
 	    print_debug = 0;
 	  }
-	  if(argc > 3) {
-	    end_point = atoi(argv[3]);
+	  if(argc > 4) {
+	    end_point = atoi(argv[4]);
 	  }
 	}
-
+      }
+      
     }
   }
   //debug情報非表示でstep実行は止まってるのと見分けがつかない
