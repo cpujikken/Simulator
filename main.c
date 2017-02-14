@@ -63,9 +63,9 @@ int main(int argc,char *argv[])
 	  mode_step = 0;
 	  if(start_print==0) {
 	    print_debug = 1;
-	    mode_step = 1;
+	    //mode_step = 1;
 	  } else {
-	    start_with_step = 1;//mode_step;
+	    start_with_step = 1;
 	    mode_step = 0;
 	    print_debug = 0;
 	  }
