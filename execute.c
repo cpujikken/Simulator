@@ -325,9 +325,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     load(ra,reg[rb]+o.const16);
     break;
   case OP_LDD:
-    i = reg[l.rs] * l.size4 + reg[l.ro];
+    i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
     }
     load(l.rd,i);
     break;
@@ -338,9 +338,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     store(l.rd,reg[rb]+o.const16);
     break;
   case OP_SDD:
-    i = reg[l.rs] * l.size4 + reg[l.ro];
+    i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
     }
     store(l.rd,i);
     break;
@@ -351,9 +351,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     fload(l.rd,reg[rb]+o.const16);
     break;
   case OP_FLDD:
-    i = reg[l.rs] * l.size4 + reg[l.ro];
+    i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
     }
     fload(l.rd,i);
     break;
@@ -364,9 +364,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     fstore(l.rd,reg[rb]+o.const16);
     break;
   case OP_FSDD:
-    i = reg[l.rs] * l.size4 + reg[l.ro];
+    i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d * %d + %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
     }
     fstore(l.rd,i);
     break;
