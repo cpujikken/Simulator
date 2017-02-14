@@ -466,7 +466,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(print_debug)
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]-4);
-    if(used[OP_SIP] > 1024) {
+    if(used[OP_SIP] > sip_count) {
       printf("function call over 1024 times\n");
       stop = 1;
     }

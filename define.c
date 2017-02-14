@@ -5,7 +5,7 @@
  */
 
 //実行中の命令名など、デバッグ用の情報を表示する
-int print_debug = 1;
+int print_debug = 0;
 
 //命令をバイナリでも表示(主にアセンブラデバッグ用)
 int print_op_bin = 0;
@@ -27,3 +27,5 @@ int init_randomize = 0;
 
 //入力sldファイルの名称
 char name_sld[20] = "contest.sld";
+
+int sip_count = 1024;

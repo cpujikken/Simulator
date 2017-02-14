@@ -10,4 +10,5 @@ extern int mode_step;
 extern int print_little;
 extern int init_randomize;
 extern char name_sld[];
+extern int sip_count;
 #endif
