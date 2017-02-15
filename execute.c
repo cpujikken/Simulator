@@ -8,6 +8,8 @@
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
 
+int sipflag = 0;
+
 int setflag(int rnum) {
   if(reg[rnum] == 0) {
     flag[ZF] = 1;
@@ -182,10 +184,13 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_J:
-    if(used[OP_SIP] > sip_count) {
-      printf("function call over %d times\n",sip_count);
+    if(sipflag) {
       printf("jumping from %s to %s\n",addr2label(pc),addr2label(o.off_addr26));
       print_com(pc-4);
+      sipflag = 0;
+    }
+    if(used[OP_SIP] > sip_count) {
+      printf("function call over %d times\n",sip_count);
       stop = 1;
     } else {
       jump(o.off_addr26);
@@ -285,10 +290,13 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
-    if(used[OP_SIP] > sip_count) {
-      printf("function call over %d times\n",sip_count);
+    if(sipflag) {
       printf("jumping from %s to %s\n",addr2label(pc),addr2label(i));
       print_com(pc-4);
+      sipflag = 0;
+    }
+    if(used[OP_SIP] > sip_count) {
+      printf("function call over %d times\n",sip_count);
       stop = 1;
     } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
@@ -475,6 +483,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_SIP:
     /*命令セットにはIP+8とあるが、
       命令実行前にすでにIPに4足してあるのでここは+4*/
+    sipflag = 1;
     md.i = pc+4;
     for(i=0;i<4;i++) {
       memory[reg[REG_SP]-4+i] = md.c[3-i];//stack pointer-4番地にストア
