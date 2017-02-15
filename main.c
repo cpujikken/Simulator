@@ -16,6 +16,9 @@ double gettime() {
 
 int main(int argc,char *argv[])
 {
+  //asm( "pushf\n\torl $0x40000,(%rsp)\n\tpopf");//バスエラー検出
+  printf("argv[1]=%s\n",argv[1]);
+
   char s[20];
   unsigned int i;
   int line = 0;
@@ -25,9 +28,8 @@ int main(int argc,char *argv[])
   double t1,t2;//実行時間測定用
   int num;//ステップ実行用
   int read;//ステップ実行用
-
+  
   t1 = gettime();
-
   if(argc > 1) {
     //ステップ実行モード
     if(argv[1][0] == '-' && argv[1][1] == 's') {
@@ -69,9 +71,9 @@ int main(int argc,char *argv[])
 	  }
 	}
       }
-      
     }
   }
+
   //debug情報非表示でstep実行は止まってるのと見分けがつかない
   if(print_debug == 0 && mode_step == 1) {
     mode_step = 0;
@@ -82,7 +84,7 @@ int main(int argc,char *argv[])
     printf("binary file open error\n");
     return -1;
   }
-
+  
   //コメント付きのファイルをオープン
   if(print_debug == 1 && (fp_com = fopen("comment.s","r")) == NULL) {
     printf("comment.s does not exist\n");
@@ -108,7 +110,6 @@ int main(int argc,char *argv[])
   //コードをメモリに載せる
   for(i=0;fread(memory+i,sizeof(unsigned char),1,fp) > 0;i++) {
   }
-  
   fclose(fp);
   codesize = i;//何番地めまで読み込んだのか
   if(fp_com != NULL) {
@@ -142,6 +143,7 @@ int main(int argc,char *argv[])
     return -1;
   }
 
+  
   //まずプログラム開始番地を読み、PCに代入
   init_pc = read_mem32(0);
 
@@ -184,19 +186,13 @@ int main(int argc,char *argv[])
     }
     
     //comment.sについていたコメントを表示
-    if(print_debug) {
-      if(fp_com != NULL && pc < 4*COMMENT_CODESIZE_MAX && pc >= 4) {
-	printf(" #%s",memory_com[pc/4-1]);//基本はpc/4、initial_ip分-1した
-      } else {
-	putchar('\n');
-      }
-    }
+    print_com(pc);
     //binary表示
     if(print_op_bin && print_debug) {
       printf("IP = %d \t| ",pc);
       print_mem(pc);
     }
-    
+   
     //ステップ実行の場合,"n","p"などを読む
     if(mode_step) {
       read = 1;
@@ -306,6 +302,6 @@ int main(int argc,char *argv[])
   
   //実行時間の表示
   printf("elapsed time: %fs\n",t2-t1);
-
+  /**/
   return 0;
 }

@@ -464,3 +464,14 @@ void print_op(Operation o,Ldst l) {
   
   return;
 }
+
+void print_com(unsigned int ip) {
+  if(print_debug) {
+    if(fp_com != NULL && ip < 4*COMMENT_CODESIZE_MAX && ip >= 4) {
+      printf(" #%s",memory_com[ip/4-1]);//基本はpc/4、initial_ip分-1した
+    } else {
+      putchar('\n');
+    }
+  }
+  
+}

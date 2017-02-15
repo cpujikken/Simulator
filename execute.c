@@ -182,7 +182,14 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_J:
-    jump(o.off_addr26);
+    if(used[OP_SIP] > sip_count) {
+      printf("function call over %d times\n",sip_count);
+      printf("jumping from %s to %s\n",addr2label(pc),addr2label(o.off_addr26));
+      print_com(pc-4);
+      stop = 1;
+    } else {
+      jump(o.off_addr26);
+    }
     break;
   case OP_JZ:
     if(flag[ZF]) {
@@ -278,12 +285,18 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
-    if(print_debug)
+    if(used[OP_SIP] > sip_count) {
+      printf("function call over %d times\n",sip_count);
+      printf("jumping from %s to %s\n",addr2label(pc),addr2label(i));
+      print_com(pc-4);
+      stop = 1;
+    } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
+    }
     jump(i);
     break;
   case OP_MV:
-    reg[ra]=reg[rb];
+    reg[ra] = reg[rb];
     dprintr(ra);
     break;
   case OP_NEG1:
@@ -392,6 +405,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     reg[ra] = (reg[rb] >> reg[rc]);
     dprintr(ra);
     break;
+    /*
   case OP_RF:
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
@@ -433,6 +447,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     break;
+    */
   case OP_PRINT:
     print_to_file(ra);
     break;
@@ -466,10 +481,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(print_debug)
       printf(" => STORED %d TO MEMORY[%d]\n",md.i,reg[REG_SP]-4);
-    if(used[OP_SIP] > sip_count) {
-      printf("function call over 1024 times\n");
-      stop = 1;
-    }
     break;
   case OP_FIN:
     if(print_debug==0&&print_to_stdin==1) {
