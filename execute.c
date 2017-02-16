@@ -119,18 +119,16 @@ void jump(unsigned int j) {
     stop = 1;
     return;
   }
-  printf(" => jumping from %d(%s) to %d(%s)\n",pc,addr2label(pc),j,addr2label(j));
+  if(print_debug) {
+    printf(" => JUMP FROM %d(%s) TO %d(%s)\n",
+	   pc,addr2label(pc),j,addr2label(j));
+  }
 
   pc = j;
   if(mode_jump) {
     mode_jump = 0;
     mode_step = 1;
   }
-  /*
-  if(print_debug) {
-    printf(" => JUMPED TO %d(%s)\n",j,addr2label(j));
-  }
-  */
 }
 //ジャンプ非成立時の表示
 void nojump() {
@@ -189,7 +187,10 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_J:
     if(sipflag) {
-      //print_com(pc-4);
+      if(print_debug == 0) {
+	printf("jumping from %d(%s) to %d(%s)\n",
+	       pc,addr2label(pc),o.off_addr26,addr2label(o.off_addr26));
+      }
       sipflag = 0;
     }
     if(used[OP_SIP] > sip_count) {
@@ -294,7 +295,10 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
     if(sipflag) {
-      //print_com(pc-4);
+      if(print_debug == 0) {
+	printf("jumping from %d(%s) to %d(%s)\n",
+	       pc,addr2label(pc),o.off_addr26,addr2label(o.off_addr26));
+      }
       sipflag = 0;
     }
     if(used[OP_SIP] > sip_count) {
