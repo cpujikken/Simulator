@@ -119,14 +119,18 @@ void jump(unsigned int j) {
     stop = 1;
     return;
   }
+  printf(" => jumping from %d(%s) to %d(%s)\n",pc,addr2label(pc),j,addr2label(j));
+
   pc = j;
   if(mode_jump) {
     mode_jump = 0;
     mode_step = 1;
   }
+  /*
   if(print_debug) {
     printf(" => JUMPED TO %d(%s)\n",j,addr2label(j));
   }
+  */
 }
 //ジャンプ非成立時の表示
 void nojump() {
@@ -185,8 +189,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_J:
     if(sipflag) {
-      printf("jumping from %s to %s\n",addr2label(pc),addr2label(o.off_addr26));
-      print_com(pc-4);
+      //print_com(pc-4);
       sipflag = 0;
     }
     if(used[OP_SIP] > sip_count) {
@@ -291,8 +294,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
     if(sipflag) {
-      printf("jumping from %s to %s\n",addr2label(pc),addr2label(i));
-      print_com(pc-4);
+      //print_com(pc-4);
       sipflag = 0;
     }
     if(used[OP_SIP] > sip_count) {
@@ -413,49 +415,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     reg[ra] = (reg[rb] >> reg[rc]);
     dprintr(ra);
     break;
-    /*
-  case OP_RF:
-    if(fp_sld == NULL) {
-      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
-	printf("%s not found\n",name_sld);
-	stop = 1;
-      }
-    }
-    if(fp_sld != NULL) {
-      if(fscanf(fp_sld,"%f",&freg[ra]) == EOF) {
-	printf("read EOF from %s\n",name_sld);
-      } else {
-	dprintfr(ra);
-      }
-    }
-    break;
-  case OP_RI:
-    if(print_debug) {
-      printf("input to %%r%d >",ra);
-    }
-    if(fp_sld == NULL) {
-      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
-	printf("%s not found\n",name_sld);
-	stop = 1;
-      }
-    }
-    if(fp_sld != NULL) {
-      if(fscanf(fp_sld,"%lf",&doub) == EOF) {
-	printf("read EOF from %s\n",name_sld);
-	stop = 1;
-      } else {
-	reg[ra] = doub;
-	if(doub - reg[ra] != 0) {
-	  printf("error in RI : input was floating-point number(%f)\n",doub);
-	  stop = 1;
-	} else {
-	  setflag(ra);
-	  dprintr(ra);
-	}
-      }
-    }
-    break;
-    */
   case OP_PRINT:
     print_to_file(ra);
     break;

@@ -10,6 +10,7 @@ extern int mode_step;
 extern int print_little;
 extern int init_randomize;
 extern char name_sld[];
+extern int print_comment;
 extern char name_com[];
 extern int sip_count;
 #endif

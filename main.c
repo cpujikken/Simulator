@@ -17,7 +17,6 @@ double gettime() {
 int main(int argc,char *argv[])
 {
   //asm( "pushf\n\torl $0x40000,(%rsp)\n\tpopf");//バスエラー検出
-  //printf("argv[1]=%s\n",argv[1]);
 
   char s[20];
   unsigned int i;
@@ -85,10 +84,12 @@ int main(int argc,char *argv[])
     return -1;
   }
   
+  
   //コメント付きのファイルをオープン
-  if(print_debug == 1 && (fp_com = fopen(name_com,"rb")) == NULL) {
+  if(print_debug == 1 && print_comment == 1 && (fp_com = fopen(name_com,"rb")) == NULL) {
     printf("%s does not exist\n",name_com);
   }
+  
 
   //HW用、レジスタやメモリの初期値をランダム化
   //初期値が0埋めされてなくても実行できるかのテスト
@@ -112,11 +113,14 @@ int main(int argc,char *argv[])
   }
   fclose(fp);
   codesize = i;//何番地めまで読み込んだのか
+  
   if(fp_com != NULL) {
     for(i=0;i<codesize/4;i++) {
       fgets(memory_com[i],COMMENT_LENGTH,fp_com);
     }
+  
   }
+  
   if(print_stat) {
     //メモリ使用領域を記録
     for(i=0;i<codesize/4;i++) {
@@ -169,112 +173,116 @@ int main(int argc,char *argv[])
       print_debug = 1;
     }
 
-
     //命令解読
-    op = read_mem32(pc);
-    o =  parse(op);
-    l = parse_ldst(op);
-
-  //命令を表示 _labelファイルがあるときはラベル名も表示
-    print_op(o,l);
-    if(print_debug) {
-      printf(" \t#");
-      if(label_info) {
-	printf("%s,",addr2label(pc));
+    if(pc > codesize) {
+      stop = 1;
+    } else {
+      op = read_mem32(pc);
+      o =  parse(op);
+      l = parse_ldst(op);
+      
+      //命令を表示 _labelファイルがあるときはラベル名も表示
+      print_op(o,l);
+      if(print_debug) {
+	printf(" \t#");
+	if(label_info) {
+	  printf("%s,",addr2label(pc));
+	}
+	printf("IP=%d,din=%d",pc,dyna);
       }
-      printf("IP=%d,din=%d",pc,dyna);
-    }
-    
-    //comment.sについていたコメントを表示
-    print_com(pc);
-    //binary表示
-    if(print_op_bin && print_debug) {
-      printf("IP = %d \t| ",pc);
-      print_mem(pc);
-    }
-   
-    //ステップ実行の場合,"n","p"などを読む
-    if(mode_step) {
-      read = 1;
-      while(read) {
-	scanf("%s",s);
-	if(strcmp(s,"n") == 0) {
-	  read = 0;
-	} else if(strcmp(s,"s") == 0) {
-	  read = 0;
-	  //前の命令がSIPである必要がある
-	  i = read_mem32(pc-4);
-	  i = i >> 26;//i=前の命令のオペコード
-	  if(i == OP_SIP) {
-	    mode_sipnext = pc + 4;
+      
+      //comment.sについていたコメントを表示
+      print_com(pc);
+
+      //binary表示
+      if(print_op_bin && print_debug) {
+	printf("IP = %d \t| ",pc);
+	print_mem(pc);
+      }
+      
+      //ステップ実行の場合,"n","p"などを読む
+      if(mode_step) {
+	read = 1;
+	while(read) {
+	  scanf("%s",s);
+	  if(strcmp(s,"n") == 0) {
+	    read = 0;
+	  } else if(strcmp(s,"s") == 0) {
+	    read = 0;
+	    //前の命令がSIPである必要がある
+	    i = read_mem32(pc-4);
+	    i = i >> 26;//i=前の命令のオペコード
+	    if(i == OP_SIP) {
+	      mode_sipnext = pc + 4;
+	    }
+	  } else if(strcmp(s,"j") == 0) {
+	    read = 0;
+	    mode_step = 0;
+	    mode_jump = 1;
+	  } else if(strcmp(s,"r") == 0) {
+	    read = 0;
+	    print_debug = 0;
+	    mode_step = 0;
+	  } else if(strcmp(s,"rp") == 0){
+	    read = 0;
+	    mode_step = 0;
+	  } else if(strcmp(s,"q") == 0 || strcmp(s,"quit") == 0) {
+	    read=0;
+	    stop=1;
+	  } else if(strcmp(s,"pr") == 0) {
+	    print_reg();
+	  } else if(strcmp(s,"pfr") == 0) {
+	    print_freg();
+	  } else if(strcmp(s,"pip") == 0) {
+	    print_pc();
+	  } else if(strcmp(s,"pdin") == 0) {
+	    printf("%d\n",dyna);
+	  } else if(strcmp(s,"pm_int") == 0) {
+	    Mydata my;
+	    scanf("%d",&num);
+	    my.i = read_mem32(num);
+	    printf("MEMORY[%d] = %d\n",num,my.si);
+	  } else if(strcmp(s,"pm_float") == 0) {
+	    Mydata my;
+	    scanf("%d",&num);
+	    my.i = read_mem32(num);
+	    printf("MEMORY[%d] = %f\n",num,my.f);
+	  } else if(strcmp(s,"pm_bin") == 0) {
+	    scanf("%d",&num);
+	    printf("MEMORY[%d] = ",num);
+	    print_mem(num);
+	  }else if(strcmp(s,"pr_bin") == 0) {
+	    scanf("%d",&num);
+	    print_bin_little((unsigned int)reg[num]);
+	  }else if(strcmp(s,"pfr_bin") == 0) {
+	    scanf("%d",&num);
+	    print_bin_little((unsigned int)freg[num]);
 	  }
-	} else if(strcmp(s,"j") == 0) {
-	  read = 0;
-	  mode_step = 0;
-	  mode_jump = 1;
-	} else if(strcmp(s,"r") == 0) {
-	  read = 0;
-	  print_debug = 0;
-	  mode_step = 0;
-	} else if(strcmp(s,"rp") == 0){
-	  read = 0;
-	  mode_step = 0;
-	} else if(strcmp(s,"q") == 0 || strcmp(s,"quit") == 0) {
-	  read=0;
-	  stop=1;
-	} else if(strcmp(s,"pr") == 0) {
-	  print_reg();
-	} else if(strcmp(s,"pfr") == 0) {
-	  print_freg();
-	} else if(strcmp(s,"pip") == 0) {
-	  print_pc();
-	} else if(strcmp(s,"pdin") == 0) {
-	  printf("%d\n",dyna);
-	} else if(strcmp(s,"pm_int") == 0) {
-	  Mydata my;
-	  scanf("%d",&num);
-	  my.i = read_mem32(num);
-	  printf("MEMORY[%d] = %d\n",num,my.si);
-	} else if(strcmp(s,"pm_float") == 0) {
-	  Mydata my;
-	  scanf("%d",&num);
-	  my.i = read_mem32(num);
-	  printf("MEMORY[%d] = %f\n",num,my.f);
-	} else if(strcmp(s,"pm_bin") == 0) {
-	  scanf("%d",&num);
-	  printf("MEMORY[%d] = ",num);
-	  print_mem(num);
-	}else if(strcmp(s,"pr_bin") == 0) {
-	  scanf("%d",&num);
-	  print_bin_little((unsigned int)reg[num]);
-	}else if(strcmp(s,"pfr_bin") == 0) {
-	  scanf("%d",&num);
-	  print_bin_little((unsigned int)freg[num]);
-	}
-	//シミュレータのデバッグ用。ポインタ表示機能
-	else if(strcmp(s,"pp_r") == 0) {
-	  scanf("%d",&num);
-	  printf("&%%r%d = ",num);
-	  print_pointer((void *)(reg+num));
-	}else if(strcmp(s,"pp_fr") == 0) {
-	  scanf("%d",&num);
-	  printf("&%%fr%d = ",num);
-	  print_pointer((void *)(freg+num));
-	}else if(strcmp(s,"pp_mem") == 0) {
-	  scanf("%d",&num);
-	  printf("&memory[%d] = ",num);
-	  print_pointer((void *)(memory+num));
-	}
-	else {
-	  printf("undefined command\n");
+	  //シミュレータのデバッグ用。ポインタ表示機能
+	  else if(strcmp(s,"pp_r") == 0) {
+	    scanf("%d",&num);
+	    printf("&%%r%d = ",num);
+	    print_pointer((void *)(reg+num));
+	  }else if(strcmp(s,"pp_fr") == 0) {
+	    scanf("%d",&num);
+	    printf("&%%fr%d = ",num);
+	    print_pointer((void *)(freg+num));
+	  }else if(strcmp(s,"pp_mem") == 0) {
+	    scanf("%d",&num);
+	    printf("&memory[%d] = ",num);
+	    print_pointer((void *)(memory+num));
+	  }
+	  else {
+	    printf("undefined command\n");
+	  }
 	}
       }
     }
     pc += 4;//命令を読んだ瞬間(just before executing it)に+される
-
+    
     if(stop==0)
       execute(op,o,l);//命令実行
-
+    
     //pcがソースコードの長さ以上になったら
     if(pc > codesize) {
       printf("IP exceeded source code size. Simulation finished.\n");

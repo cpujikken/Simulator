@@ -466,6 +466,10 @@ void print_op(Operation o,Ldst l) {
 }
 
 void print_com(unsigned int ip) {
+  if(print_comment == 0){
+    putchar('\n');
+    return;
+  }
   if(print_debug && fp_com != NULL) {
     int i = ip/4 - 1;//基本はip/4、initial_ipにコメントがない分-1した
     if(i >=0 && i < COMMENT_CODESIZE_MAX) {
@@ -474,5 +478,4 @@ void print_com(unsigned int ip) {
       putchar('\n');
     }
   }
-  
 }
