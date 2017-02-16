@@ -17,7 +17,7 @@ double gettime() {
 int main(int argc,char *argv[])
 {
   //asm( "pushf\n\torl $0x40000,(%rsp)\n\tpopf");//バスエラー検出
-  printf("argv[1]=%s\n",argv[1]);
+  //printf("argv[1]=%s\n",argv[1]);
 
   char s[20];
   unsigned int i;
@@ -86,8 +86,8 @@ int main(int argc,char *argv[])
   }
   
   //コメント付きのファイルをオープン
-  if(print_debug == 1 && (fp_com = fopen("comment.s","r")) == NULL) {
-    printf("comment.s does not exist\n");
+  if(print_debug == 1 && (fp_com = fopen(name_com,"rb")) == NULL) {
+    printf("%s does not exist\n",name_com);
   }
 
   //HW用、レジスタやメモリの初期値をランダム化

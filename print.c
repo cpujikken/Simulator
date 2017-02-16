@@ -466,9 +466,10 @@ void print_op(Operation o,Ldst l) {
 }
 
 void print_com(unsigned int ip) {
-  if(print_debug) {
-    if(fp_com != NULL && ip < 4*COMMENT_CODESIZE_MAX && ip >= 4) {
-      printf(" #%s",memory_com[ip/4-1]);//基本はpc/4、initial_ip分-1した
+  if(print_debug && fp_com != NULL) {
+    int i = ip/4 - 1;//基本はip/4、initial_ipにコメントがない分-1した
+    if(i >=0 && i < COMMENT_CODESIZE_MAX) {
+      printf(" #%s",memory_com[i]);
     } else {
       putchar('\n');
     }

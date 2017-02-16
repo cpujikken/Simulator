@@ -25,7 +25,10 @@ int print_little = 1;
 //初期値が0でなくても正しく実行されるかのテストに使用。
 int init_randomize = 0;
 
-//入力sldファイルの名称
-char name_sld[20] = "contest.sld";
 
+//入力sldファイルの名称
+char name_sld[100] = "contest.sld";
+//アセンブリのコメントを書いたファイルの名称
+char name_com[100] = "comment.s";
+//関数呼び出しがこの回数以上になったら実行を中止する
 int sip_count = 1024;
