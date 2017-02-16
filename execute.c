@@ -196,7 +196,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       sipflag = 0;
     }
     if(call_stack > sip_count) {
-      printf("function call over %d times\n",sip_count);
+      printf("function call depth over %d\n",sip_count);
       print_stack();
       stop = 1;
     } else {
@@ -307,7 +307,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       sipflag = 0;
     }
     if(call_stack > sip_count) {
-      printf("function call over %d times\n",sip_count);
+      printf("function call depth over %d\n",sip_count);
       print_stack();
       stop = 1;
     } else if(print_debug) {
