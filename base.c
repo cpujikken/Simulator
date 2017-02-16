@@ -28,6 +28,7 @@ int start_print = -1;
 int start_with_step = 0;//ステップ実行でstart_pointを指定した場合、start_pointになるまでこれを1にし、start_pointになったらそこからstep実行をする
 int end_point = -1;
 int call_stack = 0;
+int *label_stack = NULL;//関数呼び出し時のラベルを記憶するスタック
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;
@@ -36,3 +37,4 @@ FILE *fp_out;
 FILE *fp_sld = NULL;
 FILE *fp_com = NULL;
 char memory_com[COMMENT_CODESIZE_MAX][COMMENT_LENGTH];
+

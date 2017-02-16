@@ -12,6 +12,8 @@ extern void dprintr(unsigned int);
 extern void dprintfr(unsigned int);
 extern void print_reg();
 extern void print_freg();
+extern void set_stack();
+extern void print_stack();
 extern void print_pc();
 extern void print_opc(unsigned int);
 extern void print_op(Operation,Ldst);

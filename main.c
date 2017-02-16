@@ -147,6 +147,7 @@ int main(int argc,char *argv[])
     return -1;
   }
 
+  set_stack();//デバッグ用の、関数呼び出しの記録を取るスタックをセット
   
   //まずプログラム開始番地を読み、PCに代入
   init_pc = read_mem32(0);

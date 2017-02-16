@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "define.h"
 #include "base.h"
 #include "parse.h"
+#include "label.h"
 #include "print.h"
 
 
@@ -133,9 +135,6 @@ void print_pc() {
   return;
 }
 
-//未使用
-void print_link_stack();
-
 //統計情報をプリントアウト
 void print_statistics() {
   int i=0;
@@ -166,7 +165,18 @@ void print_statistics() {
     }
   }
   printf("memory usage : %d Byte (= %f MiB)\n",use,use/1024.0/1024.0);
+}
 
+void set_stack() {
+  label_stack = malloc(sizeof(int)*(sip_count+1));
+}
+
+//
+void print_stack() {
+  int i=0;
+  for(i=0;i<sip_count;i++) {
+    printf("%s\n",addr2label(label_stack[i]));
+  }
 }
 
 //シミュレータのデバッグ用、レジスタやメモリが指すポインタを表示
