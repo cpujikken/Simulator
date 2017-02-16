@@ -197,7 +197,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(call_stack > sip_count) {
       printf("function call depth over %d\n",sip_count);
-      print_stack();
+      //print_stack();
       stop = 1;
     } else {
       jump(o.off_addr26);
@@ -308,7 +308,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     }
     if(call_stack > sip_count) {
       printf("function call depth over %d\n",sip_count);
-      print_stack();
+      //print_stack();
       stop = 1;
     } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);

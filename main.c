@@ -301,6 +301,8 @@ int main(int argc,char *argv[])
 
   //最後にレジスタや統計情報等を表示
   if(print_stat) {
+    print_stack();
+    putchar('\n');
     print_reg();
     print_freg();
     print_pc();

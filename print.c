@@ -171,9 +171,10 @@ void set_stack() {
   label_stack = malloc(sizeof(int)*(sip_count+1));
 }
 
-//
+//関数呼び出しがどうなってるか表示
 void print_stack() {
   int i=0;
+  printf("function call:\n");
   for(i=0;i<sip_count;i++) {
     printf("%s\n",addr2label(label_stack[i]));
   }
