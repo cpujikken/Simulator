@@ -8,7 +8,7 @@
 int print_debug = 0;
 
 //命令をバイナリでも表示(主にアセンブラデバッグ用)
-int print_op_bin = 0;
+int print_op_bin = 1;
 
 //PRINT命令の結果を(_outファイルでなく)標準出力に出力(print_debug=0の時のみ有効)
 int print_to_stdin = 0;
@@ -32,4 +32,4 @@ int print_comment = 1;
 //アセンブリのコメントを書いたファイルの名称
 char name_com[100] = "comment.s";
 //関数呼び出しがこの回数以上になったら実行を中止する
-int sip_count = 100;
+int sip_count = 1024;
