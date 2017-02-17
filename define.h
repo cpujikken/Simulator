@@ -13,4 +13,5 @@ extern char name_sld[];
 extern int print_comment;
 extern char name_com[];
 extern int sip_count;
+extern int print_function_call;
 #endif

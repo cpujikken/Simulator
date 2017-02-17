@@ -33,3 +33,5 @@ int print_comment = 1;
 char name_com[100] = "comment.s";
 //関数呼び出しがこの回数以上になったら実行を中止する
 int sip_count = 1024;
+//SIP->J[JC]時に、ジャンプ先をプリントする
+int print_function_call = 1;
