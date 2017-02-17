@@ -167,8 +167,9 @@ void print_statistics() {
   printf("memory usage : %d Byte (= %f MiB)\n",use,use/1024.0/1024.0);
 }
 
-void set_stack() {
-  label_stack = calloc(sip_count+1,sizeof(int));
+void set_stack(unsigned int init) {
+  label_stack = calloc(sip_count+1,sizeof(unsigned int));
+  label_stack[0] = init;
 }
 
 //関数呼び出しがどうなってるか表示

@@ -187,17 +187,11 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_J:
     if(sipflag) {
-      /*
-      if(print_debug == 0) {
-	printf("jumping from %d(%s) to %d(%s)\n",
-	       pc,addr2label(pc),o.off_addr26,addr2label(o.off_addr26));
-      }
-      */
+      label_stack[call_stack] = o.off_addr26;
       sipflag = 0;
     }
     if(call_stack > sip_count) {
       printf("function call depth over %d\n",sip_count);
-      //print_stack();
       stop = 1;
     } else {
       jump(o.off_addr26);
@@ -298,17 +292,11 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
     if(sipflag) {
-      /*
-      if(print_debug == 0) {
-	printf("jumping from %d(%s) to %d(%s)\n",
-	       pc,addr2label(pc),o.off_addr26,addr2label(o.off_addr26));
-      }
-      */
+      label_stack[call_stack] = i;
       sipflag = 0;
     }
     if(call_stack > sip_count) {
       printf("function call depth over %d\n",sip_count);
-      //print_stack();
       stop = 1;
     } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
@@ -361,7 +349,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_LDD:
     i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d\n",l.rs,l.size4,l.ro,i);
     }
     load(l.rd,i);
     break;
@@ -374,7 +362,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_SDD:
     i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d\n",l.rs,l.size4,l.ro,i);
     }
     store(l.rd,i);
     break;
@@ -387,7 +375,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_FLDD:
     i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d\n",l.rs,l.size4,l.ro,i);
     }
     fload(l.rd,i);
     break;
@@ -400,7 +388,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_FSDD:
     i = reg[l.rs] + l.size4 * reg[l.ro];
     if(print_debug) {
-      printf(" => %%r%d + %d * %%r%d = %d",l.rs,l.size4,l.ro,i);
+      printf(" => %%r%d + %d * %%r%d = %d\n",l.rs,l.size4,l.ro,i);
     }
     fstore(l.rd,i);
     break;
@@ -452,7 +440,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_SIP:
     //デバッグ用
     sipflag = 1;
-    label_stack[call_stack] = pc;
     call_stack++;
     /*命令セットにはIP+8とあるが、
       命令実行前にすでにIPに4足してあるのでここは+4*/

@@ -146,11 +146,11 @@ int main(int argc,char *argv[])
     printf("file open error\n");
     return -1;
   }
-
-  set_stack();//デバッグ用の、関数呼び出しの記録を取るスタックをセット
   
   //まずプログラム開始番地を読み、PCに代入
   init_pc = read_mem32(0);
+
+  set_stack(init_pc);//デバッグ用の、関数呼び出しの記録を取るスタックをセット
 
   pc = init_pc;
   if(print_debug) {
@@ -313,6 +313,6 @@ int main(int argc,char *argv[])
   
   //実行時間の表示
   printf("elapsed time: %fs\n",t2-t1);
-  /**/
+  /*  */
   return 0;
 }
