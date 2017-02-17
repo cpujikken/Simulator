@@ -298,9 +298,10 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     if(sipflag) {
       label_stack[call_stack] = i;
       sipflag = 0;
+      if(print_function_call == 1 && print_debug == 0) {
 	printf("function call: %s -> %s\n",
 	       addr2label(pc),addr2label(i));
-
+      }
     }
     if(call_stack > sip_count) {
       printf("function call depth over %d\n",sip_count);
