@@ -65,6 +65,8 @@ int main(int argc,char *argv[])
 	    start_with_step = mode_step;
 	    mode_step = 0;
 	    print_debug = 0;
+	  } else {
+	    print_debug = 1;
 	  }
 	  if(argc > 4) {
 	    end_point = atoi(argv[4]);
