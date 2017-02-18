@@ -176,7 +176,7 @@ void set_stack(unsigned int init) {
 void print_stack() {
   int i=0;
   printf("function call:\n");
-  for(i=0;i<used[OP_SIP] - used[OP_LINK];i++) {
+  for(i=0;i<=used[OP_SIP] - used[OP_LINK];i++) {
     printf("%s\n",addr2label(label_stack[i]));
   }
 }
