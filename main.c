@@ -192,16 +192,7 @@ int main(int argc,char *argv[])
       l = parse_ldst(op);
       
       //命令を表示 _labelファイルがあるときはラベル名も表示
-      print_op(o,l);
-      if(print_debug) {
-	printf(" \t#");
-	if(label_info) {
-	  printf("%s,",addr2label(pc));
-	}
-	printf("IP=%d,din=%d",pc,dyna);
-      }
-      //comment.sについていたコメントを表示
-      print_com(pc);
+      print_op(o,l,pc);
       pred_ip = pc;
 
       //binary表示
@@ -233,7 +224,9 @@ int main(int argc,char *argv[])
 	    read = 0;
 	    print_debug = 0;
 	    mode_step = 0;
-	    //} else if(strcmp(s,"din") == 0) {
+	  } else if(strcmp(s,"din") == 0) {
+	    scanf("%d",&num);
+	    
 	  } else if(strcmp(s,"rp") == 0){
 	    read = 0;
 	    mode_step = 0;
@@ -320,17 +313,8 @@ int main(int argc,char *argv[])
       o = parse(op);
       l = parse_ldst(op);
       printf("last operation:\n");
-      print_op(o,l);
-      if(print_debug) {
-	printf(" \t#");
-	if(label_info) {
-	  printf("%s,",addr2label(pc));
-	}
-	printf("IP=%d,din=%d",pc,dyna);
-      }
-      print_com(pred_ip);
+      print_op(o,l,pred_ip);
     }
-    putchar('\n');
     putchar('\n');
     print_reg();
     print_freg();

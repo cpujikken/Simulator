@@ -7,7 +7,6 @@
 #include "label.h"
 #include "print.h"
 
-
 //読み込んだ命令(32bit)を16進数表示 リトルエンディアン用
 //だったのですが、バイナリで表示することにしました。そのほうが見やすいし。
 void print_hex(unsigned int op) {
@@ -353,7 +352,22 @@ void print_opc(unsigned int opcode) {
   return;
 }
 
-void print_op(Operation o,Ldst l) {
+void print_com(unsigned int ip) {
+  if(print_comment == 0){
+    putchar('\n');
+    return;
+  }
+  if(print_debug && fp_com != NULL) {
+    int i = ip/4 - 1;//基本はip/4、initial_ipにコメントがない分-1した
+    if(i >=0 && i < COMMENT_CODESIZE_MAX) {
+      printf(" #%s",memory_com[i]);
+    } else {
+      putchar('\n');
+    }
+  }
+}
+
+void print_op(Operation o,Ldst l,unsigned int ip) {
   
   if(print_debug == 0) 
     return;
@@ -458,21 +472,20 @@ void print_op(Operation o,Ldst l) {
     printf("%%fr%d, $%d",l.rd,l.addr21);
     break;
   }
+
+  int i;
+  if(print_debug) {
+    printf(" \t#");
+    if(label_info) {
+      i = used[OP_SIP]-used[OP_LINK]-sipflag;
+      if(i>=0 && i<=sip_count) {
+	printf("%s,",addr2label(label_stack[i]));
+      }
+    }
+    printf("IP=%d,din=%d",pc,dyna);
+  }
+  //comment.sについていたコメントを表示
+  print_com(pc);
   
   return;
-}
-
-void print_com(unsigned int ip) {
-  if(print_comment == 0){
-    putchar('\n');
-    return;
-  }
-  if(print_debug && fp_com != NULL) {
-    int i = ip/4 - 1;//基本はip/4、initial_ipにコメントがない分-1した
-    if(i >=0 && i < COMMENT_CODESIZE_MAX) {
-      printf(" #%s",memory_com[i]);
-    } else {
-      putchar('\n');
-    }
-  }
 }

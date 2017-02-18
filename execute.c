@@ -8,8 +8,6 @@
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
 
-int sipflag = 0;
-
 int setflag(int rnum) {
   if(reg[rnum] == 0) {
     flag[ZF] = 1;
@@ -30,7 +28,7 @@ int setflag(int rnum) {
  */
 //アクセスするメモリの値がおかしい場合は停止
 int isnil(unsigned int addr) {
-  if(addr >= MEM_SIZE) {
+  if(addr >= MEM_SIZE || addr % 4 != 0) {
     printf("accessing nil memory(MEMORY[%d])\n",addr);
     stop = 1;
     return 1;

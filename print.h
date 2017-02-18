@@ -16,7 +16,7 @@ extern void set_stack(unsigned int);
 extern void print_stack();
 extern void print_pc();
 extern void print_opc(unsigned int);
-extern void print_op(Operation,Ldst);
 extern void print_pointer(void *);
 extern void print_com(unsigned int);
+
 #endif
