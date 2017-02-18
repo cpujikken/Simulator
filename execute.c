@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "define.h"
 #include "base.h"
 #include "print.h"
 #include "label.h"
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
+
+char s_error[100];
 
 int setflag(int rnum) {
   if(reg[rnum] == 0) {
@@ -29,7 +32,7 @@ int setflag(int rnum) {
 //アクセスするメモリの値がおかしい場合は停止
 int isnil(unsigned int addr) {
   if(addr >= MEM_SIZE || addr % 4 != 0) {
-    printf("accessing nil memory(MEMORY[%d])\n",addr);
+    sprintf(error_mes,"accessing nil memory(MEMORY[%d])\n",addr);
     stop = 1;
     return 1;
   }
@@ -112,8 +115,7 @@ int fstore(unsigned int rnum,unsigned int addr) {
 void jump(unsigned int j) {
   //0番地にジャンプすることはないはずなので、その時は停止する
   if(j <= 0) {
-    printf("jumped to wrong address(%d)",j);
-    printf(" at IP=%d\n",pc);
+    sprintf(error_mes,"jumped to wrong address(%d)",j);
     stop = 1;
     return;
   }
@@ -139,7 +141,8 @@ void nojump() {
 void stop_ifinf(int rnum) {
   if(isinf(freg[rnum])) {
     stop = 1;
-    printf("%%fr%d is infinity\n",rnum);
+    sprintf(error_mes,"%%fr%d is infinity\n",rnum);
+
   }  
 }
 
@@ -193,7 +196,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     if(call_stack > sip_count) {
-      printf("function call depth over %d\n",sip_count);
+      sprintf(error_mes,"function call depth over %d\n",sip_count);
       stop = 1;
     } else {
       jump(o.off_addr26);
@@ -234,7 +237,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_FDIV:
     if(freg[rc] == 0) {
-      printf("devision by %f\n",freg[rc]);
+    strcpy(error_mes,"division by zero\n");
+
+      //printf("devision by %f\n",freg[rc]);
       stop = 1;
       } else {
       freg[ra] = freg[rb] / freg[rc];
@@ -281,9 +286,12 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_LINK:
     i = reg[REG_SP] - 4;
+    /*
     if(i < 0) {
+      
       printf("accessing nil memory(%d) : at IP = %d\n",i,pc);
     }
+      */
     i = read_mem32(i);//stack pointer-4番地をロード
     if(print_debug)
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
@@ -302,7 +310,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       }
     }
     if(call_stack > sip_count) {
-      printf("function call depth over %d\n",sip_count);
+      sprintf(error_mes,"function call depth over %d\n",sip_count);
       stop = 1;
     } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
@@ -436,7 +444,8 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_DIV:
     if(reg[rc] == 0) {
-      printf("division by 0\n");
+      strcpy(error_mes,"division by zero\n");
+      //printf("division by 0\n");
       stop = 1;
     } else {
       reg[ra] = reg[rb] / reg[rc];
@@ -482,7 +491,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     //sldファイルから文字列をバイナリとして1byte読み取る
     if(fp_sld == NULL) {
       if((fp_sld = fopen(name_sld,"rb")) == NULL) {
-	printf("%s not found\n",name_sld);
+	sprintf(error_mes,"%s not found\n",name_sld);
 	stop = 1;
       }
     }
@@ -513,7 +522,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
     
   default:
-    printf("undefined operation\n");
+    strcpy(error_mes,"undefined operation");
+
+    //printf("undefined operation\n");
     stop = 1;
   }
 
@@ -526,7 +537,8 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 
   //動的命令数が指定回数以上になったらシミュレーションを終える
   if(end_point > 0 && dyna >= end_point) {
-    printf("arrived at end point\n");
+    strcpy(error_mes,"arrived at end point\n");
+    //printf("arrived at end point\n");
     stop = 1;
   }
 

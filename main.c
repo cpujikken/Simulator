@@ -291,7 +291,7 @@ int main(int argc,char *argv[])
     
     //pcがソースコードの長さ以上になったら
     if(pc > codesize) {
-      printf("IP exceeded source code size. Simulation finished.\n");
+      sprintf(error_mes,"IP exceeded source code size\n");
       stop = 1;
     }
   }
@@ -308,6 +308,7 @@ int main(int argc,char *argv[])
   if(print_stat) {
     print_stack();
     putchar('\n');
+    printf("%s",error_mes);
     //最後に実行した命令をプリント
     if(pred_ip > 0 && pred_ip <= codesize) {
       print_debug = 1;

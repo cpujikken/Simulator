@@ -131,6 +131,67 @@ void print_statistics() {
   }
   printf("dynamic instruction number :\t%d\n",dyna);
 
+  //系統ごとに分けて動的命令数をプリント
+  int alu_op,fpu_op,jump_op,load_op,store_op,readwrite_op,other_op;
+  alu_op =
+    used[OP_ADD]
+    + used[OP_SUB]
+    + used[OP_ADDI]
+    + used[OP_HALF]
+    + used[OP_FOUR]
+    + used[OP_CMP]
+    + used[OP_MV]
+    + used[OP_NEG1]
+    + used[OP_NEG2]
+    + used[OP_INC]
+    + used[OP_DEC]
+    + used[OP_INC1]
+    + used[OP_DEC1]
+    + used[OP_MVI]
+    + used[OP_SL]
+    + used[OP_SR]
+    + used[OP_MUL]
+    + used[OP_DIV];
+  fpu_op =
+    used[OP_FADD]
+    + used[OP_FSUB]
+    + used[OP_FMUL]
+    + used[OP_FDIV]
+    + used[OP_FCMP]
+    + used[OP_FNEG1]
+    + used[OP_FNEG2]
+    + used[OP_FMV]
+    + used[OP_FABS];
+  load_op =
+    used[OP_LINK]
+    + used[OP_LDR]
+    + used[OP_LDA]
+    + used[OP_LDD]
+    + used[OP_FLDR]
+    + used[OP_FLDA]
+    + used[OP_FLDD];
+  store_op =
+    used[OP_SDR]
+    + used[OP_SDA]
+    + used[OP_SDD]
+    + used[OP_FSDR]
+    + used[OP_FSDA]
+    + used[OP_FSDD]
+    + used[OP_SIP];
+  jump_op =
+    used[OP_J]
+    + used[OP_JZ]
+    + used[OP_FJLT]
+    + used[OP_FJEQ]
+    + used[OP_JC];
+  
+  other_op =
+    used[OP_NOP]
+    + used[OP_PRINT]
+    + used[OP_FIN]
+    + used[OP_RC];
+
+
   
   //条件分岐回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {

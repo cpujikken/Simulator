@@ -54,6 +54,7 @@ extern int call_stack;//どれだけ深く関数呼び出ししているか
 extern int *label_stack;//関数呼び出し時のラベルを記憶するスタック
 extern void set_stack();
 extern int sipflag;//SIPの直後かつjumpする直前のみ立てる
+extern char error_mes[];
 
 //byte単位読み込みとかで使う共用体
 typedef union {
