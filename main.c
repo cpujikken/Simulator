@@ -27,6 +27,7 @@ int main(int argc,char *argv[])
   double t1,t2;//実行時間測定用
   int num;//ステップ実行用
   int read;//ステップ実行用
+  int pred_ip;//最後の命令をprintするためのpc保存用変数
   
   t1 = gettime();
   if(argc > 1) {
@@ -86,7 +87,7 @@ int main(int argc,char *argv[])
   
   
   //コメント付きのファイルをオープン
-  if(print_debug == 1 && print_comment == 1 && (fp_com = fopen(name_com,"rb")) == NULL) {
+  if(print_debug == 1 && print_comment == 1 && (fp_com = fopen(name_com,"r")) == NULL) {
     printf("%s does not exist\n",name_com);
   }
   
@@ -179,7 +180,7 @@ int main(int argc,char *argv[])
       stop = 1;
     } else {
       op = read_mem32(pc);
-      o =  parse(op);
+      o = parse(op);
       l = parse_ldst(op);
       
       //命令を表示 _labelファイルがあるときはラベル名も表示
@@ -191,9 +192,9 @@ int main(int argc,char *argv[])
 	}
 	printf("IP=%d,din=%d",pc,dyna);
       }
-      
       //comment.sについていたコメントを表示
       print_com(pc);
+      pred_ip = pc;
 
       //binary表示
       if(print_op_bin && print_debug) {
@@ -302,6 +303,25 @@ int main(int argc,char *argv[])
   //最後にレジスタや統計情報等を表示
   if(print_stat) {
     print_stack();
+    putchar('\n');
+    //最後に実行した命令をプリント
+    if(pred_ip > 0 && pred_ip <= codesize) {
+      print_debug = 1;
+      op = read_mem32(pred_ip);
+      o = parse(op);
+      l = parse_ldst(op);
+      printf("last operation:\n");
+      print_op(o,l);
+      if(print_debug) {
+	printf(" \t#");
+	if(label_info) {
+	  printf("%s,",addr2label(pc));
+	}
+	printf("IP=%d,din=%d",pc,dyna);
+      }
+      print_com(pred_ip);
+    }
+    putchar('\n');
     putchar('\n');
     print_reg();
     print_freg();
