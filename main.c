@@ -87,8 +87,10 @@ int main(int argc,char *argv[])
   
   
   //コメント付きのファイルをオープン
-  if(print_debug == 1 && print_comment == 1 && (fp_com = fopen(name_com,"r")) == NULL) {
-    printf("%s does not exist\n",name_com);
+  if(print_comment == 1) {
+    fp_com = fopen(name_com,"r");
+    if(fp_com == NULL)
+      printf("%s does not exist\n",name_com);
   }
   
 
@@ -162,6 +164,12 @@ int main(int argc,char *argv[])
 
   //1行(32bit)ずつ実行
   while(stop == 0) {
+    
+    if(dyna % 10000000 == 0) {
+      printf("din = %d\n",dyna);
+    }
+    
+
     //skipモードなら次の番地まで飛ばす
     if(mode_sipnext > 0 && mode_step==1) {
       mode_step = 0;
@@ -225,6 +233,7 @@ int main(int argc,char *argv[])
 	    read = 0;
 	    print_debug = 0;
 	    mode_step = 0;
+	    //} else if(strcmp(s,"din") == 0) {
 	  } else if(strcmp(s,"rp") == 0){
 	    read = 0;
 	    mode_step = 0;

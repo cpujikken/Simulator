@@ -8,7 +8,7 @@
 int print_debug = 0;
 
 //命令をバイナリでも表示(主にアセンブラデバッグ用)
-int print_op_bin = 1;
+int print_op_bin = 0;
 
 //PRINT命令の結果を(_outファイルでなく)標準出力に出力(print_debug=0の時のみ有効)
 int print_to_stdin = 0;
@@ -19,19 +19,17 @@ int print_raw = 1;
 int print_stat = 1;
 //ステップ実行する
 int mode_step = 0;
-//PRINTでの出力のバイトオーダをリトルエンディアンにする
-int print_little = 1;
 //レジスタやメモリの初期値をランダムにします。
 //初期値が0でなくても正しく実行されるかのテストに使用。
 int init_randomize = 0;
 
 //入力sldファイルの名称
 char name_sld[100] = "contest.sld";
-//アセンブリのコメントを表示するか
+//アセンブリコードのコメントを表示するか
 int print_comment = 1;
 //アセンブリのコメントを書いたファイルの名称
-char name_com[100] = "comment.s";
+char name_com[100] = "../compiler/comment.s";
 //関数呼び出しがこの回数以上になったら実行を中止する
 int sip_count = 1024;
 //SIP->J[JC]時に、ジャンプ先をプリントする
-int print_function_call = 1;
+int print_function_call = 0;
