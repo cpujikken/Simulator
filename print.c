@@ -152,6 +152,7 @@ void print_statistics() {
     + used[OP_SR]
     + used[OP_MUL]
     + used[OP_DIV];
+  printf("alu related:\t%d\t times\n",alu_op);
   fpu_op =
     used[OP_FADD]
     + used[OP_FSUB]
@@ -162,6 +163,7 @@ void print_statistics() {
     + used[OP_FNEG2]
     + used[OP_FMV]
     + used[OP_FABS];
+  printf("fpu related:\t%d\t times\n",fpu_op);
   load_op =
     used[OP_LINK]
     + used[OP_LDR]
@@ -170,6 +172,7 @@ void print_statistics() {
     + used[OP_FLDR]
     + used[OP_FLDA]
     + used[OP_FLDD];
+  printf("load related\t%d\t times\n",load_op);
   store_op =
     used[OP_SDR]
     + used[OP_SDA]
@@ -178,20 +181,20 @@ void print_statistics() {
     + used[OP_FSDA]
     + used[OP_FSDD]
     + used[OP_SIP];
+  printf("store related\t%d\t times\n",store_op);
   jump_op =
     used[OP_J]
     + used[OP_JZ]
     + used[OP_FJLT]
     + used[OP_FJEQ]
     + used[OP_JC];
-  
+  printf("jump related:\t%d\t times\n",jump_op);
   other_op =
     used[OP_NOP]
     + used[OP_PRINT]
     + used[OP_FIN]
     + used[OP_RC];
-
-
+  printf("other operations(=NOP,PRINT,FIN,RC):\t%d\t times\n",other_op);
   
   //条件分岐回数をプリント
   for(i=0;i<NUM_OF_OP;i++) {
