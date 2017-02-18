@@ -1,7 +1,7 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-#define MEM_SIZE 67108864
+#define MEM_SIZE 100000000
 #define INIT_SP 33554432
 #define INIT_HP 1048576
 #define NUM_OF_OP 57
@@ -17,6 +17,7 @@
 #define UNDEFINED 3
 #define COMMENT_LENGTH 100 //コメントを読み込む際の、読み込むコメントの１行の長さ
 #define COMMENT_CODESIZE_MAX 100000 //codesizeがこれ以上のときはコメントを読み込めない
+
 extern int reg[];
 extern float freg[];
 extern char memory[];

@@ -167,7 +167,7 @@ int main(int argc,char *argv[])
   //1行(32bit)ずつ実行
   while(stop == 0) {
     
-    if(dyna % 10000000 == 0) {
+    if(din_count > 0 && dyna % din_count == 0) {
       printf("din = %ld\n",dyna);
     }
     
