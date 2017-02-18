@@ -168,8 +168,9 @@ int main(int argc,char *argv[])
   while(stop == 0) {
     
     if(dyna % 10000000 == 0) {
-      printf("din = %d\n",dyna);
+      printf("din = %ld\n",dyna);
     }
+    
     
 
     //skipモードなら次の番地まで飛ばす
@@ -242,7 +243,7 @@ int main(int argc,char *argv[])
 	  } else if(strcmp(s,"pip") == 0) {
 	    print_pc();
 	  } else if(strcmp(s,"pdin") == 0) {
-	    printf("%d\n",dyna);
+	    printf("%ld\n",dyna);
 	  } else if(strcmp(s,"pm_int") == 0) {
 	    Mydata my;
 	    scanf("%d",&num);

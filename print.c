@@ -129,7 +129,7 @@ void print_statistics() {
       printf(":\t%d\ttimes\n",used[i]);
     }
   }
-  printf("dynamic instruction number :\t%d\n",dyna);
+  printf("dynamic instruction number :\t%ld\n",dyna);
 
   //系統ごとに分けて動的命令数をプリント
   int alu_op,fpu_op,jump_op,load_op,store_op,readwrite_op,other_op;
@@ -546,7 +546,7 @@ void print_op(Operation o,Ldst l,unsigned int ip) {
 	printf("%s,",addr2label(label_stack[i]));
       }
     }
-    printf("IP=%d,din=%d",pc,dyna);
+    printf("IP=%d,din=%ld",pc,dyna);
   }
   //comment.sについていたコメントを表示
   print_com(pc);

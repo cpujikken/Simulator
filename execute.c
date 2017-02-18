@@ -195,7 +195,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	       addr2label(pc),addr2label(o.off_addr26));
       }
     }
-    if(call_stack > sip_count) {
+    if(sip_count >= 0 && call_stack > sip_count) {
       sprintf(error_mes,"function call depth over %d\n",sip_count);
       stop = 1;
     } else {
@@ -309,7 +309,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	       addr2label(pc),addr2label(i));
       }
     }
-    if(call_stack > sip_count) {
+    if(sip_count >= 0 && call_stack > sip_count) {
       sprintf(error_mes,"function call depth over %d\n",sip_count);
       stop = 1;
     } else if(print_debug) {

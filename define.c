@@ -29,7 +29,7 @@ char name_sld[100] = "contest.sld";
 int print_comment = 1;
 //アセンブリのコメントを書いたファイルの名称
 char name_com[100] = "../compiler/comment.s";
-//関数呼び出しがこの回数以上になったら実行を中止する
+//関数呼び出しがこの回数以上になったら実行を中止する -1で無効
 int sip_count = 1024;
 //SIP->J[JC]時に、ジャンプ先をプリントする
 int print_function_call = 0;
