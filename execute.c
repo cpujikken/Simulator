@@ -119,7 +119,7 @@ void jump(unsigned int j) {
   }
   if(print_debug) {
     printf(" => JUMP FROM %d(%s) TO %d(%s)\n",
-	   pc,addr2label(pc),j,addr2label(j));
+	   pc-4,addr2label(pc-4),j,addr2label(j));
   }
 
   pc = j;
