@@ -29,6 +29,7 @@ int start_with_step = 0;//ステップ実行でstart_pointを指定した場合�
 int end_point = -1;
 int call_stack = 0;
 int *label_stack = NULL;//関数呼び出し時のラベルを記憶するスタック
+int sipflag = 0;
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;

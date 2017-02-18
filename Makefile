@@ -20,3 +20,6 @@ clean_bin:
 move_test:
 	mv ../assembler/example ./
 	mv ../assembler/example_label ./ 
+run:
+	./bsim ../compiler/build/example ../compiler/sld/base.sld
+
