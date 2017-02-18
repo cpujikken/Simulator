@@ -34,4 +34,4 @@ int sip_count = 1024;
 //SIP->J[JC]時に、ジャンプ先をプリントする
 int print_function_call = 0;
 
-int din_count = 20000000;//dinがこれの倍数になるたびに標準出力、0以下だと表示しない
+int din_count = 10000000;//dinがこれの倍数になるたびに標準出力、0以下だと表示しない

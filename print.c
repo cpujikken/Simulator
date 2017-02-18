@@ -100,6 +100,8 @@ void print_reg() {
     if(reg[i] != 0)
       printf("%%r%d = %d\n",i,reg[i]);
   }
+  printf("reg_hp_max = %d\n",reg_hp_max);
+  printf("reg_sp_max = %d\n",reg_sp_max);
   printf("\n");
   return;
 }

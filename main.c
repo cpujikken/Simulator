@@ -295,6 +295,14 @@ int main(int argc,char *argv[])
       sprintf(error_mes,"IP exceeded source code size\n");
       stop = 1;
     }
+    //reg_hp_max,reg_sp_maxを更新
+    if(reg_hp_max < reg[REG_HP]) {
+      reg_hp_max = reg[REG_HP];
+    }
+    if(reg_sp_max < reg[REG_SP]) {
+      reg_sp_max = reg[REG_SP];
+    }
+    
   }
 
   putchar('\n');

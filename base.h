@@ -1,7 +1,7 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-#define MEM_SIZE 100000000
+#define MEM_SIZE 100000000//メモリサイズ
 #define INIT_SP 33554432
 #define INIT_HP 1048576
 #define NUM_OF_OP 57
@@ -56,6 +56,8 @@ extern int *label_stack;//関数呼び出し時のラベルを記憶するスタ
 extern void set_stack();
 extern int sipflag;//SIPの直後かつjumpする直前のみ立てる
 extern char error_mes[];
+extern int reg_hp_max;
+extern int reg_sp_max;
 
 //byte単位読み込みとかで使う共用体
 typedef union {
