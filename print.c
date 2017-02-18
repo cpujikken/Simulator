@@ -72,27 +72,12 @@ void print_to_file(unsigned int rnum) {
     return;
   }
   
-  //リトルエンディアン->ビッグエンディアン??
-  //とりあえずリトルエンディアンのまま出力
-  if(print_little) {
-    Mydata myd;
-    myd.i = reg[rnum];
-    fwrite((void *)(&myd.c),sizeof(char),1,fp_out);
-    if(print_debug) {
-      printf(" => print out %s\n",myd.c);
-      //print_bin_little(reg[rnum]);
-    }
-  } else {
-    Mydata myd;
-    myd.i = reg[rnum];
-    int i;
-    for(i=3;i>=0;i--){
-      fwrite((void *)(myd.c + i),sizeof(char),1,fp_out);
-    }
-    if(print_debug) {
-      printf(" => print out (in big endian) ");
-      print_bin_little(reg[rnum]);
-    }
+  //リトルエンディアンとか関係なくなったので
+  Mydata myd;
+  myd.i = reg[rnum];
+  fwrite((void *)(&myd.c),sizeof(char),1,fp_out);
+  if(print_debug) {
+    printf(" => print out %s\n",myd.c);
   }
 }
 
