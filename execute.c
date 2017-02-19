@@ -338,11 +338,11 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintfr(ra);
     break;
   case OP_INC:
-    reg[ra] = reg[ra] + 1;
+    reg[ra]++;
     dprintr(ra);
     break;
   case OP_DEC:
-    reg[ra] = reg[ra] - 1;
+    reg[ra]--;
     dprintr(ra);
     break;
   case OP_INC1:
