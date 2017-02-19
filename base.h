@@ -17,6 +17,7 @@
 #define UNDEFINED 3
 #define COMMENT_LENGTH 100 //コメントを読み込む際の、読み込むコメントの１行の長さ
 #define COMMENT_CODESIZE_MAX 100000 //codesizeがこれ以上のときはコメントを読み込めない
+#define MAX_FUN_DEPTH 100000 //関数呼び出しの深さがこれ以上になると、ラベルの表示に失敗 
 
 extern int reg[];
 extern float freg[];

@@ -219,21 +219,30 @@ void print_statistics() {
   }
   printf("memory usage : %d Byte (= %f MiB)\n",use,use/1024.0/1024.0);
 }
-
 void set_stack(unsigned int init) {
-  label_stack = calloc(sip_count+1,sizeof(unsigned int));
-  label_stack[0] = init;
+  if(sip_count < 0) {
+    label_stack = calloc(MAX_FUN_DEPTH+1,sizeof(unsigned int));
+  } else {    
+    label_stack = calloc(sip_count+1,sizeof(unsigned int));
+  }
+    label_stack[0] = init;
 }
 
 //関数呼び出しがどうなってるか表示
 void print_stack() {
   int i=0;
   printf("function call:\n");
-  for(i=0;i<=used[OP_SIP] - used[OP_LINK];i++) {
+  int j = used[OP_SIP] - used[OP_LINK];
+  if(j>MAX_FUN_DEPTH) {
+    j = MAX_FUN_DEPTH;
+  }
+  for(i=0;i<=j;i++) {
     printf("%s\n",addr2label(label_stack[i]));
   }
+  if(used[OP_SIP] > used[OP_LINK]) {
+    printf("関数呼び出しが深すぎて、最後まで表示できません。\nもっと表示したい場合はbase.hのMAX_FUN_DEPTHを変更してください。");
+  }
 }
-
 //シミュレータのデバッグ用、レジスタやメモリが指すポインタを表示
 void print_pointer(void *p){
   printf("%10p\n",p);
@@ -547,7 +556,7 @@ void print_op(Operation o,Ldst l,unsigned int ip) {
     printf(" \t#");
     if(label_info) {
       i = used[OP_SIP]-used[OP_LINK]-sipflag;
-      if(i>=0 && i<=sip_count) {
+      if(i>=0 && (i<=sip_count || sip_count < 0) && i < MAX_FUN_DEPTH) {
 	printf("%s,",addr2label(label_stack[i]));
       }
     }

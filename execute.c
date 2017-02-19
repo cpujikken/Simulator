@@ -188,7 +188,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_J:
     if(sipflag) {
-      label_stack[call_stack] = o.off_addr26;
+      if(call_stack < MAX_FUN_DEPTH) {
+	label_stack[call_stack] = o.off_addr26;
+      }
       sipflag = 0;
       if(print_function_call == 1 && print_debug == 0) {
 	printf("function call: %s -> %s\n",
@@ -302,7 +304,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_JC:
     i = read_mem32(reg[REG_CL]);//stack pointer番地をロード
     if(sipflag) {
-      label_stack[call_stack] = i;
+      if(call_stack < MAX_FUN_DEPTH) {
+	label_stack[call_stack] = i;
+      }
       sipflag = 0;
       if(print_function_call == 1 && print_debug == 0) {
 	printf("function call: %s -> %s\n",
@@ -490,12 +494,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     md.i=0;//mdを初期化
     //sldファイルから文字列をバイナリとして1byte読み取る
     if(fp_sld == NULL) {
-      if((fp_sld = fopen(name_sld,"rb")) == NULL) {
-	sprintf(error_mes,"%s not found\n",name_sld);
-	stop = 1;
-      }
-    }
-    if(fp_sld != NULL) {
+      sprintf(error_mes,"%s not found\n",name_sld);
+      stop = 1;
+    } else {
       if((i=fread(&(md.c[0]),sizeof(char),1,fp_sld)) <= 0) {
 	reg[ra] = 255;
 	if(print_debug) {
@@ -511,8 +512,9 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	}	
 	if(print_debug) {
 	  printf(" => %%r%d = ",ra);
+	  putchar('\'');
 	  putchar(md.c[0]);
-	  printf(" | ");
+	  printf("\' | ");
 	  print_bin_byte(md.c[0]);
 	  putchar('\n');
 	}

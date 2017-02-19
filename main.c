@@ -94,8 +94,15 @@ int main(int argc,char *argv[])
     if(fp_com == NULL)
       printf("%s does not exist\n",name_com);
   }
-  
 
+  //入力sldファイルをオープン
+  /*
+
+  */
+  fp_sld = fopen(name_sld,"rb");
+  if(fp_sld == NULL) {
+    printf("%s not found\n",name_sld);
+  }
   //HW用、レジスタやメモリの初期値をランダム化
   //初期値が0埋めされてなくても実行できるかのテスト
   if(init_randomize) {
@@ -320,7 +327,7 @@ int main(int argc,char *argv[])
   t2 = gettime();
 
   if(fp_sld != NULL) {
-    fclose(fp_sld);
+    //fclose(fp_sld);
   }
 
   //最後にレジスタや統計情報等を表示
