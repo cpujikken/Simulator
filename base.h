@@ -1,7 +1,7 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-#define MEM_SIZE 100000000//メモリサイズ
+#define MEM_SIZE 536870912//メモリサイズ
 #define INIT_SP 33554432
 #define INIT_HP 1048576
 #define NUM_OF_OP 57
@@ -41,7 +41,7 @@ extern unsigned int codesize;
 extern int stop;//実行を中止(実行を完了したときもこれを呼ぶ)
 extern int mode_jump;//「次のジャンプ命令まで一気に実行」モード
 extern int mode_sipnext;
-extern int used[];//各命令が使われた回数
+extern long used[];//各命令が使われた回数
 extern unsigned long dyna;//動的実行命令数
 extern int branch[];//条件分岐で分岐したか
 extern int nbranch[];//否か

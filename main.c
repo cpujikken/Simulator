@@ -302,10 +302,17 @@ int main(int argc,char *argv[])
     if(reg_sp_max < reg[REG_SP]) {
       reg_sp_max = reg[REG_SP];
     }
-    if(reg_hp_max >= init_sp) {
-      sprintf(error_mes,"heap pointer reached stack domain\n");
-      stop = 1;
-    }
+    //ヒープポインタがスタック領域に侵入したらor
+    //スタックポインタがヒープ領域に侵入したら
+    if(init_hp < init_sp) {
+      if(reg_hp_max >= init_sp) {
+	sprintf(error_mes,"heap pointer reached stack domain\n");
+	stop = 1;
+      }
+    } else if(reg_sp_max >= init_hp) {
+	sprintf(error_mes,"heap pointer reached stack domain\n");
+	stop = 1;
+    }      
   }
 
   putchar('\n');

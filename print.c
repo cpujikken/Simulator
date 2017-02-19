@@ -130,7 +130,7 @@ void print_statistics() {
   for(i=0;i<NUM_OF_OP;i++) {
     if(used[i]>0) {
       print_opc(i);
-      printf(":\t%d\ttimes\n",used[i]);
+      printf(":\t%ld\ttimes\n",used[i]);
     }
   }
   printf("dynamic instruction number :\t%ld\n",dyna);

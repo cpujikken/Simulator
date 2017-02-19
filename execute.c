@@ -508,8 +508,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
 	  if(print_debug) {
 	    printf("%%r%d = 255(EOF)\n",ra);
 	  }
-	}
-	
+	}	
 	if(print_debug) {
 	  printf(" => %%r%d = ",ra);
 	  putchar(md.c[0]);
