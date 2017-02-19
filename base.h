@@ -59,6 +59,10 @@ extern int sipflag;//SIPの直後かつjumpする直前のみ立てる
 extern char error_mes[];
 extern int reg_hp_max;
 extern int reg_sp_max;
+extern int hp_flag;
+extern int sp_flag;
+extern int init_hp;
+extern int init_sp;
 
 //byte単位読み込みとかで使う共用体
 typedef union {

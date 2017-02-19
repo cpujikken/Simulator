@@ -33,6 +33,10 @@ int sipflag = 0;
 char error_mes[100] = "normal end\n";
 int reg_hp_max = 0;
 int reg_sp_max = 0;
+int hp_flag = 1;
+int sp_flag = 1;
+int init_hp=0;
+int init_sp=0;
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;

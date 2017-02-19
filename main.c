@@ -309,15 +309,28 @@ int main(int argc,char *argv[])
     if(reg_sp_max < reg[REG_SP]) {
       reg_sp_max = reg[REG_SP];
     }
+
+    //デバッグ用の機能
+    //reg_spに最初に値が代入されたらそれがinit_sp ヒープも同様
+    if(sp_flag && reg[REG_SP] != 0) {
+      init_sp = reg[REG_SP];
+      sp_flag = 0;
+    }
+    if(hp_flag && reg[REG_HP] != 0) {
+      init_hp = reg[REG_HP];
+      hp_flag = 0;
+    }
+    
+    //デバッグ用の機能
     //ヒープポインタがスタック領域に侵入したらor
-    //スタックポインタがヒープ領域に侵入したら
+    //スタックポインタがヒープ領域に侵入したらストップ
     if(init_hp < init_sp) {
       if(reg_hp_max >= init_sp) {
 	sprintf(error_mes,"heap pointer reached stack domain\n");
 	stop = 1;
       }
     } else if(reg_sp_max >= init_hp) {
-	sprintf(error_mes,"heap pointer reached stack domain\n");
+	sprintf(error_mes,"stack pointer reached heap domain\n");
 	stop = 1;
     }      
   }
