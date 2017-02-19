@@ -33,5 +33,8 @@ char name_com[100] = "../compiler/comment.s";
 int sip_count = -1;
 //SIP->J[JC]時に、ジャンプ先をプリントする
 int print_function_call = 0;
-
-int din_count = -1;//dinがこれの倍数になるたびに標準出力、0以下だと表示しない
+//dinがこれの倍数になるたびに標準出力、0以下だと表示しない
+int din_count = -1;
+//heap pointer,stack pointerの初期値(デバッグ用。実際のレジスタへの代入はプログラム中で行う)
+int init_hp = 134217728;
+int init_sp = 268435456;

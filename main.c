@@ -302,7 +302,10 @@ int main(int argc,char *argv[])
     if(reg_sp_max < reg[REG_SP]) {
       reg_sp_max = reg[REG_SP];
     }
-    
+    if(reg_hp_max >= init_sp) {
+      sprintf(error_mes,"heap pointer reached stack domain\n");
+      stop = 1;
+    }
   }
 
   putchar('\n');

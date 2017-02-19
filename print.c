@@ -100,8 +100,10 @@ void print_reg() {
     if(reg[i] != 0)
       printf("%%r%d = %d\n",i,reg[i]);
   }
-  printf("reg_hp_max = %d\n",reg_hp_max);
-  printf("reg_sp_max = %d\n",reg_sp_max);
+  i = reg_hp_max - init_hp;
+  printf("heap domain : %d Byte (= %f MiB)\n",i,i/1024.0/1024.0);
+  i = reg_sp_max - init_sp;
+  printf("stack domain : %d Byte (= %f MiB)\n",i,i/1024.0/1024.0);
   printf("\n");
   return;
 }
@@ -209,6 +211,7 @@ void print_statistics() {
 
   //メモリ使用量をカウント
   int use=0;
+  printf("code size : %d Byte (= %f MiB)\n",codesize,codesize/1024.0/1024.0);
   for(i=0;i<MEM_SIZE/4;i++) {
     if(mem_used[i]) {
       use += 4;
