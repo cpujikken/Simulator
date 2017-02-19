@@ -30,8 +30,8 @@ int print_comment = 1;
 //アセンブリのコメントを書いたファイルの名称
 char name_com[100] = "../compiler/comment.s";
 //関数呼び出しがこの回数以上になったら実行を中止する -1で無効
-int sip_count = 1024;
+int sip_count = -1;
 //SIP->J[JC]時に、ジャンプ先をプリントする
 int print_function_call = 0;
 
-int din_count = 10000000;//dinがこれの倍数になるたびに標準出力、0以下だと表示しない
+int din_count = -1;//dinがこれの倍数になるたびに標準出力、0以下だと表示しない
