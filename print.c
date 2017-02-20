@@ -131,7 +131,7 @@ void print_statistics() {
       printf(":\t%ld\ttimes\n",used[i]);
     }
   }
-  printf("dynamic instruction number :\t%ld\n",dyna);
+  printf("dynamic instruction count :\t%ld\n",dyna);
 
   //系統ごとに分けて動的命令数をプリント
   long alu_op,fpu_op,jump_op,load_op,store_op,readwrite_op,other_op;
@@ -244,8 +244,10 @@ void print_stack() {
     j = MAX_FUN_DEPTH;
   }
   int k = j - PRINT_FUN_NUM;//最大PRINT_FUN_NUM個の関数を表示
-  if (k<0) {
+  if (k<=0) {
     k=0;
+  } else {
+    printf("...\n");
   }
   for(i=k;i<=j;i++) {
     printf("%s\n",addr2label(label_stack[i]));
@@ -574,7 +576,7 @@ void print_op(Operation o,Ldst l,unsigned int ip) {
 	printf("%s(※label of current position),",addr2label(pc-4));
       }
     }
-    printf("IP=%d,din=%ld",pc,dyna);
+    printf("IP=%d,dic=%ld",pc,dyna);
   }
   //comment.sについていたコメントを表示
   print_com(pc);
