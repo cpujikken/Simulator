@@ -100,6 +100,8 @@ void print_reg() {
     if(reg[i] != 0)
       printf("%%r%d = %d\n",i,reg[i]);
   }
+  printf("max_hp = %d\n",reg_hp_max);
+  printf("max_sp = %d\n",reg_sp_max);
   printf("\n");
   return;
 }
@@ -559,10 +561,13 @@ void print_op(Operation o,Ldst l,unsigned int ip) {
   int i;
   if(print_debug) {
     printf(" \t#");
+    //ラベルの情報を表示
     if(label_info) {
       i = used[OP_SIP]-used[OP_LINK]-sipflag;
       if(i>=0 && (i<=sip_count || sip_count < 0) && i < MAX_FUN_DEPTH) {
 	printf("%s,",addr2label(label_stack[i]));
+      } else if(pc>=4){
+	printf("%s(※label of current position),",addr2label(pc-4));
       }
     }
     printf("IP=%d,din=%ld",pc,dyna);

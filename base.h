@@ -2,8 +2,6 @@
 #define _BASE_H_
 
 #define MEM_SIZE 536870912//メモリサイズ
-#define INIT_SP 33554432
-#define INIT_HP 1048576
 #define NUM_OF_OP 57
 #define NUM_OF_REG 32//レジスタの数は32
 #define REG_LR 32//使わない

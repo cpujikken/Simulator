@@ -9,6 +9,11 @@
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
 
+typedef union {
+  int s;
+  unsigned int u;
+} Su_int;
+
 char s_error[100];
 
 int setflag(int rnum) {
@@ -155,6 +160,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   Mydata md,md2;
   int i;
   double doub;
+  Su_int su;
 
   //命令使用回数をカウント
   used[o.opc]++;
@@ -179,6 +185,11 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_HALF:
+    /*    
+    su.s = reg[rb];
+    su.u >>= 1;
+    reg[ra] = su.s;
+    */
     reg[ra] = reg[rb] >> 1;
     dprintr(ra);
     break;
@@ -288,12 +299,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
   case OP_LINK:
     i = reg[REG_SP] - 4;
-    /*
-    if(i < 0) {
-      
-      printf("accessing nil memory(%d) : at IP = %d\n",i,pc);
-    }
-      */
     i = read_mem32(i);//stack pointer-4番地をロード
     if(print_debug)
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
@@ -523,7 +528,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     break;
     
   default:
-    strcpy(error_mes,"undefined operation");
+    strcpy(error_mes,"undefined operation\n");
 
     //printf("undefined operation\n");
     stop = 1;

@@ -230,6 +230,12 @@ int main(int argc,char *argv[])
 	    read = 0;
 	    mode_step = 0;
 	    mode_jump = 1;
+	  /*
+	  } else if(strcmp(s,"sl") == 0) {
+	    read = 0;
+	    mode_step = 0;
+	    mode_sl = 0;
+	  */
 	  } else if(strcmp(s,"r") == 0) {
 	    read = 0;
 	    print_debug = 0;
@@ -302,14 +308,6 @@ int main(int argc,char *argv[])
       sprintf(error_mes,"IP exceeded source code size\n");
       stop = 1;
     }
-    //reg_hp_max,reg_sp_maxを更新
-    if(reg_hp_max < reg[REG_HP]) {
-      reg_hp_max = reg[REG_HP];
-    }
-    if(reg_sp_max < reg[REG_SP]) {
-      reg_sp_max = reg[REG_SP];
-    }
-
     //デバッグ用の機能
     //reg_spに最初に値が代入されたらそれがinit_sp ヒープも同様
     if(sp_flag && reg[REG_SP] != 0) {
@@ -321,18 +319,28 @@ int main(int argc,char *argv[])
       hp_flag = 0;
     }
     
+    //reg_hp_max,reg_sp_maxを更新
+    if(reg_hp_max < reg[REG_HP]) {
+      reg_hp_max = reg[REG_HP];
+    }
+    if(reg_sp_max < reg[REG_SP]) {
+      reg_sp_max = reg[REG_SP];
+    }
+
     //デバッグ用の機能
     //ヒープポインタがスタック領域に侵入したらor
     //スタックポインタがヒープ領域に侵入したらストップ
-    if(init_hp < init_sp) {
-      if(reg_hp_max >= init_sp) {
-	sprintf(error_mes,"heap pointer reached stack domain\n");
-	stop = 1;
-      }
-    } else if(reg_sp_max >= init_hp) {
+    if(init_sp > 0 && init_hp > 0) {
+      if(init_hp < init_sp) {
+	if(reg_hp_max >= init_sp) {
+	  sprintf(error_mes,"heap pointer reached stack domain\n");
+	  stop = 1;
+	}
+      } else if(reg_sp_max >= init_hp) {
 	sprintf(error_mes,"stack pointer reached heap domain\n");
 	stop = 1;
-    }      
+      }      
+    }
   }
 
   putchar('\n');
@@ -360,8 +368,6 @@ int main(int argc,char *argv[])
     putchar('\n');
     print_reg();
     print_freg();
-    print_pc();
-    putchar('\n');
     print_statistics();
   }
   fclose(fp_out);
