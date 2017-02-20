@@ -243,10 +243,14 @@ void print_stack() {
   if(j>MAX_FUN_DEPTH) {
     j = MAX_FUN_DEPTH;
   }
-  for(i=0;i<=j;i++) {
+  int k = j - PRINT_FUN_NUM;//最大PRINT_FUN_NUM個の関数を表示
+  if (k<0) {
+    k=0;
+  }
+  for(i=k;i<=j;i++) {
     printf("%s\n",addr2label(label_stack[i]));
   }
-  if(used[OP_SIP] > used[OP_LINK]) {
+  if(used[OP_SIP] - used[OP_LINK] > MAX_FUN_DEPTH) {
     printf("関数呼び出しが深すぎて、最後まで表示できません。\nもっと表示したい場合はbase.hのMAX_FUN_DEPTHを変更してください。");
   }
 }

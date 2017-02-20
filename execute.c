@@ -88,13 +88,15 @@ int store(unsigned int rnum,int addr) {
   if(isnil(addr) != 0) {
     return 1;
   }
-  /*
-  if(addr <= codesize) {
-    strcpy(error_mes,"writing to code domain\n");
+
+  //コード領域で、$min_caml_hogehoge以外に書き込んだらエラー
+  if(addr <= codesize && strncmp("$min_caml_",addr2label(addr),10) != 0) {
+    sprintf(error_mes,"writing to code domain:%s\n",addr2label(addr));
     stop = 1;
     return 1;
   }
-  */
+  
+  
   Mydata md;
   int i;
   
@@ -111,14 +113,12 @@ int fstore(unsigned int rnum,unsigned int addr) {
   if(isnil(addr)) {
     return 1;
   }
-  //コード領域にも書き込みは起こりうる
-  /*
-  if(addr <= codesize) {
+
+  if(addr <= codesize && strncmp("$min_caml_",addr2label(addr),10) != 0) {
     strcpy(error_mes,"writing to code domain\n");
     stop = 1;
     return 1;
   }
-  */
 
   Mydata md;
   int i;
