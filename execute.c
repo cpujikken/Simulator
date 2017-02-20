@@ -90,6 +90,7 @@ int store(unsigned int rnum,int addr) {
   }
   if(addr <= codesize) {
     strcpy(error_mes,"writing to code domain\n");
+    stop = 1;
     return 1;
   }
   Mydata md;
@@ -110,6 +111,7 @@ int fstore(unsigned int rnum,unsigned int addr) {
   }
   if(addr <= codesize) {
     strcpy(error_mes,"writing to code domain\n");
+    stop = 1;
     return 1;
   }
 
