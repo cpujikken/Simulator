@@ -39,4 +39,5 @@ int sip_count = -1;
 int print_function_call = 0;
 //dinがこれの倍数になるたびに標準出力、0以下だと表示しない
 int din_count = -1;
-//heap pointer,stack pointerの初期値(デバッグ用。実際のレジスタへの代入はプログラム中で行う)
+//libraryのかわりにシミュレータで計算
+int use_system_func_mode = 1;

@@ -15,4 +15,5 @@ extern char name_com[];
 extern int sip_count;
 extern int print_function_call;
 extern int din_count;
+extern int use_system_func_mode;
 #endif

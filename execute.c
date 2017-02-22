@@ -8,12 +8,14 @@
 #include "label.h"
 #include "parse.h" //読み取る系はこっちに移転
 #include "execute.h"
+#include <math.h>
 
+/*
 typedef union {
   int s;
   unsigned int u;
 } Su_int;
-
+*/
 char s_error[100];
 
 int setflag(int rnum) {
@@ -156,6 +158,70 @@ void nojump() {
   if(print_debug)
     printf(" => NO JUMP\n");
 }
+void link_op() {
+  int i;
+  i = reg[REG_SP] - 4;
+  i = read_mem32(i);//stack pointer-4番地をロード
+  if(print_debug)
+    printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]-4);
+  reg[REG_SP] = reg[REG_SP] - 4;//pop
+  jump(i);
+  call_stack--;
+}
+
+//ライブラリ関数のかわり
+void library_func(int addr) {
+  char s[100];
+  strcpy(s,addr2label(addr));
+  //ライブラリ
+  if(strncmp(s,"$min_caml_cos",13) == 0) {
+    freg[0] = cosf(freg[1]);
+    if(print_debug) {
+      printf(" => %%r0 = cos(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strncmp(s,"$min_caml_sin",13) == 0) {
+    freg[0] = sinf(freg[1]);
+    if(print_debug) {
+      printf(" => %%r0 = sin(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strncmp(s,"$min_caml_int_of_float",22) == 0) {
+    reg[0] = (int)freg[1];
+    if(print_debug) {
+      printf(" => %%r0 = int_of_float(%f) = %d\n",freg[1],reg[0]);
+    }
+    link_op();
+  }  else if (strncmp(s,"$min_caml_float_of_int",22) == 0) {
+    freg[0] = (float)reg[1];
+    if(print_debug) {
+      printf(" => %%r0 = float_of_int(%d) = %f\n",reg[1],freg[0]);
+    }
+    link_op();
+  }  else if (strncmp(s,"$min_caml_floor",22) == 0) {
+    freg[0] = floorf(freg[1]);
+    if(print_debug) {
+      printf(" => %%fr0 = floor(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strncmp(s,"$min_caml_atan",22) == 0) {
+    freg[0] = atanf(freg[1]);
+    if(print_debug) {
+      printf(" => %%fr0 = atan(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strncmp(s,"$min_caml_sqrt",22) == 0) {
+    freg[0] = sqrtf(freg[1]);
+    if(print_debug) {
+      printf(" => %%fr0 = sqrt(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  }
+  
+    else {
+    jump(addr);
+  }
+}
 
 
 //浮動小数点演算実行後、値がinfになったら止まる
@@ -176,7 +242,7 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   Mydata md,md2;
   int i;
   double doub;
-  Su_int su;
+  //Su_int su;
 
   //命令使用回数をカウント
   used[o.opc]++;
@@ -218,7 +284,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       if(call_stack < MAX_FUN_DEPTH) {
 	label_stack[call_stack] = o.off_addr26;
       }
-      sipflag = 0;
       if(print_function_call == 1 && print_debug == 0) {
 	printf("function call: %s -> %s\n",
 	       addr2label(pc),addr2label(o.off_addr26));
@@ -228,8 +293,13 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       sprintf(error_mes,"function call depth over %d\n",sip_count);
       stop = 1;
     } else {
-      jump(o.off_addr26);
+      if(sipflag == 1 && use_system_func_mode == 1) {
+	library_func(o.off_addr26);
+      } else {
+	jump(o.off_addr26);
+      }
     }
+    sipflag = 0;
     break;
   case OP_JZ:
     if(flag[ZF]) {
@@ -267,8 +337,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
   case OP_FDIV:
     if(freg[rc] == 0) {
     strcpy(error_mes,"division by zero\n");
-
-      //printf("devision by %f\n",freg[rc]);
       stop = 1;
       } else {
       freg[ra] = freg[rb] / freg[rc];
@@ -328,7 +396,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
       if(call_stack < MAX_FUN_DEPTH) {
 	label_stack[call_stack] = i;
       }
-      sipflag = 0;
       if(print_function_call == 1 && print_debug == 0) {
 	printf("function call: %s -> %s\n",
 	       addr2label(pc),addr2label(i));
@@ -340,7 +407,12 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     } else if(print_debug) {
       printf(" READ %d FROM MEMORY[%d]\n ",i,reg[REG_SP]);
     }
-    jump(i);
+    if(sipflag == 1 && use_system_func_mode == 1) {
+      library_func(i);
+    } else {
+      jump(i);
+    }
+    sipflag = 0;
     break;
   case OP_MV:
     reg[ra] = reg[rb];

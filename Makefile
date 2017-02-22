@@ -5,7 +5,7 @@ rdwrbin = wrbin rdbin
 SOURCES = define.c base.c parse.c print.c label.c execute.c main.c
 
 $(PROGRAM): $(SOURCES)
-	$(CC) $(CFLAGS) -o $@ $(SOURCES)
+	$(CC) $(CFLAGS) -o $@ $(SOURCES) -lm
 test: $(SOURCES)
 	gcc -g -O0 -o $@ $^
 wrbin: bin_writer.c
