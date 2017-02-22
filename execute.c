@@ -167,6 +167,7 @@ void link_op() {
   reg[REG_SP] = reg[REG_SP] - 4;//pop
   jump(i);
   call_stack--;
+  used[OP_LINK]++;
 }
 
 //ライブラリ関数のかわり
@@ -186,6 +187,7 @@ void library_func(int addr) {
       printf(" => %%r0 = sin(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
+    
   } else if (strncmp(s,"$min_caml_int_of_float",22) == 0) {
     reg[0] = (int)freg[1];
     if(print_debug) {
