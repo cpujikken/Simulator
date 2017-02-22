@@ -216,8 +216,30 @@ void library_func(int addr) {
       printf(" => %%fr0 = sqrt(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
+  } else if (strncmp(s,"$min_caml_read_int",20) == 0) {
+    if(fp_sld == NULL) {
+      sprintf(error_mes,"%s not found\n",name_sld);
+      stop = 1;
+    } else {
+      double i_f;
+      fscanf(fp_sld,"%d",&reg[0]);
+      if(print_debug) {
+	printf(" => %%r0 = read_int = %d\n",reg[0]);
+      }
+      link_op();
+    }
+  } else if (strncmp(s,"$min_caml_read_float",20) == 0) {
+    if(fp_sld == NULL) {
+      sprintf(error_mes,"%s not found\n",name_sld);
+      stop = 1;
+    } else {
+      fscanf(fp_sld,"%f",&freg[0]);
+      if(print_debug) {
+	printf(" => %%fr0 = read_float = %f\n",freg[0]);
+      }
+      link_op();
+    }
   }
-  
     else {
     jump(addr);
   }
