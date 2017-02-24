@@ -350,6 +350,10 @@ int main(int argc,char *argv[])
     print_stack();
     putchar('\n');
     printf("%s",error_mes);
+    if(reg[REG_SP] > init_sp) {
+      printf("stack is not empty (%%rsp = %d > %d = initial sp)\n",
+	     reg[REG_SP],init_sp);
+    }
     //最後に実行した命令をプリント
     if(pred_ip > 0 && pred_ip <= codesize) {
       print_debug = 1;

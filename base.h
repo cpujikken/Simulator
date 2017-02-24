@@ -1,7 +1,7 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-#define MEM_SIZE 536870912//メモリサイズ
+#define MEM_SIZE 2097152//メモリサイズ 2097152byte = 2MiB
 #define NUM_OF_OP 57
 #define NUM_OF_REG 32//レジスタの数は32
 #define REG_LR 32//使わない

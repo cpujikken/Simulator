@@ -3,7 +3,7 @@
 
 int reg[32];
 float freg[32];
-char memory[MEM_SIZE];//64MB=67108864B
+char memory[MEM_SIZE];
 unsigned int pc = 0;
 unsigned int init_pc = 0;
 int lr = 0;

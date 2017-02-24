@@ -175,50 +175,50 @@ void library_func(int addr) {
   char s[100];
   strcpy(s,addr2label(addr));
   //ライブラリ
-  if(strncmp(s,"$min_caml_cos",13) == 0) {
+  if(strcmp(s,"$min_caml_cos") == 0) {
     freg[0] = cosf(freg[1]);
     if(print_debug) {
       printf(" => %%r0 = cos(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
-  } else if (strncmp(s,"$min_caml_sin",13) == 0) {
+  } else if (strcmp(s,"$min_caml_sin") == 0) {
     freg[0] = sinf(freg[1]);
     if(print_debug) {
       printf(" => %%r0 = sin(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
     
-  } else if (strncmp(s,"$min_caml_int_of_float",22) == 0) {
+  } else if (strcmp(s,"$min_caml_int_of_float") == 0) {
     reg[0] = (int)freg[1];
     if(print_debug) {
       printf(" => %%r0 = int_of_float(%f) = %d\n",freg[1],reg[0]);
     }
     link_op();
-  }  else if (strncmp(s,"$min_caml_float_of_int",22) == 0) {
+  }  else if (strcmp(s,"$min_caml_float_of_int") == 0) {
     freg[0] = (float)reg[1];
     if(print_debug) {
       printf(" => %%r0 = float_of_int(%d) = %f\n",reg[1],freg[0]);
     }
     link_op();
-  }  else if (strncmp(s,"$min_caml_floor",22) == 0) {
+  }  else if (strcmp(s,"$min_caml_floor") == 0) {
     freg[0] = floorf(freg[1]);
     if(print_debug) {
       printf(" => %%fr0 = floor(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
-  } else if (strncmp(s,"$min_caml_atan",22) == 0) {
+  } else if (strcmp(s,"$min_caml_atan") == 0) {
     freg[0] = atanf(freg[1]);
     if(print_debug) {
       printf(" => %%fr0 = atan(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
-  } else if (strncmp(s,"$min_caml_sqrt",22) == 0) {
+  } else if (strcmp(s,"$min_caml_sqrt") == 0) {
     freg[0] = sqrtf(freg[1]);
     if(print_debug) {
       printf(" => %%fr0 = sqrt(%f) = %f\n",freg[1],freg[0]);
     }
     link_op();
-  } else if (strncmp(s,"$min_caml_read_int",20) == 0) {
+  } else if (strcmp(s,"$min_caml_read_int") == 0) {
     if(fp_sld == NULL) {
       sprintf(error_mes,"%s not found\n",name_sld);
       stop = 1;
@@ -230,7 +230,7 @@ void library_func(int addr) {
       }
       link_op();
     }
-  } else if (strncmp(s,"$min_caml_read_float",20) == 0) {
+  } else if (strcmp(s,"$min_caml_read_float") == 0) {
     if(fp_sld == NULL) {
       sprintf(error_mes,"%s not found\n",name_sld);
       stop = 1;
