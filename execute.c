@@ -10,12 +10,6 @@
 #include "execute.h"
 #include <math.h>
 
-/*
-typedef union {
-  int s;
-  unsigned int u;
-} Su_int;
-*/
 char s_error[100];
 
 int setflag(int rnum) {
@@ -170,7 +164,8 @@ void link_op() {
   used[OP_LINK]++;
 }
 
-//ライブラリ関数のかわり
+//ライブラリ関数をシミュレータでかわりに計算する
+//引数は%r1か%fr1、返り値は%r0か%fr0
 void library_func(int addr) {
   char s[100];
   strcpy(s,addr2label(addr));
@@ -241,6 +236,107 @@ void library_func(int addr) {
       }
       link_op();
     }
+  } else if (strcmp(s,"$min_caml_print_int") == 0) {
+    sprintf(s,"%d",reg[1]);
+    fwrite(s,sizeof(char),strlen(s),fp_out);
+    if(print_debug) {
+      printf(" => PRINT \"%s\" (print_int(%d))\n",s,reg[1]);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_print_float") == 0) {
+    sprintf(s,"%f",freg[1]);
+    fwrite(s,sizeof(char),strlen(s),fp_out);
+    if(print_debug) {
+      printf(" => PRINT \"%s\" (print_float(%f))\n",s,freg[1]);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_print_newline") == 0) {
+    strcpy(s,"\n");
+    fwrite(s,sizeof(char),1,fp_out);
+    if(print_debug) {
+      printf(" => PRINT newline (print_newline)\n");
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_print_space") == 0) {
+    strcpy(s," ");
+    fwrite(s,sizeof(char),1,fp_out);
+    if(print_debug) {
+      printf(" => PRINT \'%s\' (print_space)\n",s);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_print_char") == 0) {
+    Mydata myd;
+    myd.i = reg[1];
+    sprintf(s,"%c",myd.c[0]);
+    fwrite(s,sizeof(char),1,fp_out);
+    if(print_debug) {
+      printf(" => PRINT %s (print_char(%c))\n",s,myd.c[0]);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fiszero") == 0) {
+    if(freg[1] == (float)0.0) {
+      reg[0] = 1;
+      if(print_debug) {
+	printf(" => %%r0 = fiszero(%f) = 1\n",freg[1]);
+      }
+    } else {
+      reg[0] = 0;
+      if(print_debug) {
+	printf(" => %%r0 = fiszero(%f) = 0\n",freg[1]);
+      }
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fispos") == 0) {
+    if(freg[1] > (float)0.0) {
+      reg[0] = 1;
+      if(print_debug) {
+	printf(" => %%r0 = fispos(%f) = 1\n",freg[1]);
+      }
+    } else {
+      reg[0] = 0;
+      if(print_debug) {
+	printf(" => %%r0 = fispos(%f) = 0\n",freg[1]);
+      }
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fisneg") == 0) {
+    if(freg[1] < (float)0.0) {
+      reg[0] = 1;
+      if(print_debug) {
+	printf(" => %%r0 = fisneg(%f) = 1\n",freg[1]);
+      }
+    } else {
+      reg[0] = 0;
+      if(print_debug) {
+	printf(" => %%r0 = fisneg(%f) = 0\n",freg[1]);
+      }
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fsqr") == 0) {
+    freg[0] = freg[1] * freg[1];
+    if(print_debug) {
+      printf(" => %%fr0 = fsqr(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fhalf") == 0) {
+    freg[0] = freg[1] / 2.0;
+    if(print_debug) {
+      printf(" => %%fr0 = fhalf(%f) = %f\n",freg[1],freg[0]);
+    }
+    link_op();
+  } else if (strcmp(s,"$min_caml_fless") == 0) {
+    if(freg[1] < freg[2]) {
+      reg[0] = 1;
+      if(print_debug) {
+	printf(" => %%r0 = fless(%f,%f) = 1\n",freg[1],freg[2]);
+      }
+    } else {
+      reg[0] = 0;
+      if(print_debug) {
+	printf(" => %%r0 = fless(%f,%f) = 1\n",freg[1],freg[2]);
+      }
+    }
+    link_op();
   }
     else {
     jump(addr);
@@ -291,11 +387,6 @@ int execute(unsigned int op ,Operation o, Ldst l) {
     dprintr(ra);
     break;
   case OP_HALF:
-    /*    
-    su.s = reg[rb];
-    su.u >>= 1;
-    reg[ra] = su.s;
-    */
     reg[ra] = reg[rb] >> 1;
     dprintr(ra);
     break;

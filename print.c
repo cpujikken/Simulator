@@ -55,23 +55,20 @@ void print_bin_big(unsigned int x){
   putchar('\n');
 }
 
+//PRINT命令
 void print_to_file(unsigned int rnum) {
-  //標準出力に出力する場合 <-?
+  //PRINTの結果をファイルではなく標準出力に出力する場合 <-?
   if(print_debug==0 && print_to_stdin==1) {
     if(print_raw){
       printf("%d\n",reg[rnum]);
     } else {
       Mydata myd;
       myd.i = reg[rnum];
-      int i;
-      for(i=3;i>=0;i--){
-	putchar(myd.c[i]);
-      }
+      putchar(myd.c[0]);
     }
     return;
   }
   
-  //リトルエンディアンとか関係なくなったので
   Mydata myd;
   myd.i = reg[rnum];
   fwrite((void *)(&myd.c),sizeof(char),1,fp_out);
@@ -458,8 +455,7 @@ void print_com(unsigned int ip) {
   }
 }
 
-void print_op(Operation o,Ldst l,unsigned int ip) {
-  
+void print_op(Operation o,Ldst l,unsigned int ip) {  
   if(print_debug == 0) 
     return;
   
