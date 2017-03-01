@@ -31,11 +31,17 @@ int setflag(int rnum) {
  * リトルエンディアンにしないと、シミュレータ的にはすごく不便
  */
 //アクセスするメモリの値がおかしい場合は停止
+//あと読み書きした最大の番地も記憶
 int isnil(unsigned int addr) {
   if(addr >= MEM_SIZE || addr % 4 != 0) {
     sprintf(error_mes,"accessing nil memory(MEMORY[%d])\n",addr);
     stop = 1;
     return 1;
+  }
+  //読み書きした最大の番地の更新
+  if(addr > max_addr_access.num) {
+    max_addr_access.num = addr;
+    max_addr_access.dic = dyna;
   }
   return 0;
 }

@@ -297,9 +297,12 @@ int main(int argc,char *argv[])
     if(stop==0)
       execute(op,o,l);//命令実行
     
-    //pcがソースコードの長さ以上になったら
+    //pcがソースコードの長さ以上になったら or 4の倍数でなかったら
     if(pc > codesize) {
       sprintf(error_mes,"IP exceeded source code size\n");
+      stop = 1;
+    } else if (pc % 4 != 0) {
+      sprintf(error_mes,"IP is not multiple of 4\n");
       stop = 1;
     }
     //デバッグ用の機能

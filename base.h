@@ -18,6 +18,11 @@
 #define MAX_FUN_DEPTH 100000 //関数呼び出しの深さがこれ以上になると、ラベルの表示に失敗 
 #define PRINT_FUN_NUM 50 //関数呼び出しの入れ子構造をいくつさかのぼって表示するか
 
+typedef struct {
+  int num;
+  int dic;
+} Nd;
+
 extern int reg[];
 extern float freg[];
 extern char memory[];
@@ -62,7 +67,7 @@ extern int hp_flag;
 extern int sp_flag;
 extern int init_hp;
 extern int init_sp;
-
+extern Nd max_addr_access;//メモリアクセスした最大の番地
 //byte単位読み込みとかで使う共用体
 typedef union {
   unsigned int i;

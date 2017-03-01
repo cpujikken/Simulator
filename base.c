@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "base.h"
 
 int reg[32];
@@ -37,6 +38,7 @@ int hp_flag = 1;
 int sp_flag = 1;
 int init_hp=0;
 int init_sp=0;
+Nd max_addr_access = {0,0};
 
 char default_file[100] = "example";// 2017/1/19 "binary"から変更
 char *filename = default_file;

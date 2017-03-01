@@ -222,6 +222,8 @@ void print_statistics() {
   }
   printf("actually written memory : %d Byte (= %f MiB)\n",
 	 use,use/1024.0/1024.0);
+  printf("maximum address accessed : %d (dic = %d)\n",
+	 max_addr_access.num,max_addr_access.dic);
 }
 void set_stack(unsigned int init) {
   if(sip_count < 0) {
